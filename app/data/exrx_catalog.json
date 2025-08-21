@@ -1,0 +1,1500 @@
+[
+  {
+    "id": "exrx:BBBenchPress",
+    "name": "Barbell Bench Press",
+    "exrx_url": "https://exrx.net/WeightExercises/PectoralSternal/BBBenchPress",
+    "primary_muscles": [
+      "chest",
+      "front_delts",
+      "triceps"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBBenchPress",
+    "name": "Dumbbell Bench Press",
+    "exrx_url": "https://exrx.net/WeightExercises/PectoralSternal/DBBenchPress",
+    "primary_muscles": [
+      "chest",
+      "front_delts",
+      "triceps"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBInclineBenchPress",
+    "name": "Incline Barbell Bench Press",
+    "exrx_url": "https://exrx.net/WeightExercises/PectoralClavicular/BBInclineBenchPress",
+    "primary_muscles": [
+      "chest",
+      "front_delts",
+      "triceps"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBInclineBenchPress",
+    "name": "Incline Dumbbell Press",
+    "exrx_url": "https://exrx.net/WeightExercises/PectoralClavicular/DBInclineBenchPress",
+    "primary_muscles": [
+      "chest",
+      "front_delts",
+      "triceps"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:LVChestPress",
+    "name": "Machine Chest Press",
+    "exrx_url": "https://exrx.net/WeightExercises/PectoralSternal/LVChestPress",
+    "primary_muscles": [
+      "chest",
+      "front_delts",
+      "triceps"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "machines"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:LVPecDeckFly",
+    "name": "Pec Deck",
+    "exrx_url": "https://exrx.net/WeightExercises/PectoralSternal/LVPecDeckFly",
+    "primary_muscles": [
+      "chest"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "machines"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBCableFly",
+    "name": "Cable Fly",
+    "exrx_url": "https://exrx.net/WeightExercises/PectoralSternal/CBCableFly",
+    "primary_muscles": [
+      "chest"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "cables"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BWPushup",
+    "name": "Push-Up",
+    "exrx_url": "https://exrx.net/WeightExercises/PectoralSternal/BWPushup",
+    "primary_muscles": [
+      "chest",
+      "front_delts",
+      "triceps"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "bodyweight"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBDeclineBenchPress",
+    "name": "Decline Barbell Bench Press",
+    "exrx_url": "https://exrx.net/WeightExercises/PectoralSternal/BBDeclineBenchPress",
+    "primary_muscles": [
+      "chest",
+      "triceps"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBDeclineBenchPress",
+    "name": "Decline Dumbbell Press",
+    "exrx_url": "https://exrx.net/WeightExercises/PectoralSternal/DBDeclineBenchPress",
+    "primary_muscles": [
+      "chest",
+      "triceps"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBCableCrossover",
+    "name": "Cable Crossover",
+    "exrx_url": "https://exrx.net/WeightExercises/PectoralSternal/CBCableCrossover",
+    "primary_muscles": [
+      "chest"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "cables"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BWInclinePushup",
+    "name": "Incline Push-Up",
+    "exrx_url": "https://exrx.net/WeightExercises/PectoralSternal/BWInclinePushup",
+    "primary_muscles": [
+      "chest",
+      "triceps"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "bodyweight"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BWDeclinePushup",
+    "name": "Decline Push-Up",
+    "exrx_url": "https://exrx.net/WeightExercises/PectoralSternal/BWDeclinePushup",
+    "primary_muscles": [
+      "chest",
+      "triceps"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "bodyweight"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBBentOverRow",
+    "name": "Barbell Bent-over Row",
+    "exrx_url": "https://exrx.net/WeightExercises/BackGeneral/BBBentOverRow",
+    "primary_muscles": [
+      "mid_back",
+      "lats",
+      "rear_delts",
+      "biceps"
+    ],
+    "function": "horizontal_pull",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBSeatedRow",
+    "name": "Seated Cable Row",
+    "exrx_url": "https://exrx.net/WeightExercises/BackGeneral/CBSeatedRow",
+    "primary_muscles": [
+      "mid_back",
+      "lats",
+      "biceps"
+    ],
+    "function": "horizontal_pull",
+    "equipment": [
+      "cables",
+      "machines"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:LVSeatedRow",
+    "name": "Machine Row (Chest-Supported)",
+    "exrx_url": "https://exrx.net/WeightExercises/BackGeneral/LVSeatedRow",
+    "primary_muscles": [
+      "mid_back",
+      "lats",
+      "biceps"
+    ],
+    "function": "horizontal_pull",
+    "equipment": [
+      "machines"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBOneArmRow",
+    "name": "One-Arm Dumbbell Row",
+    "exrx_url": "https://exrx.net/WeightExercises/BackGeneral/DBOneArmRow",
+    "primary_muscles": [
+      "mid_back",
+      "lats",
+      "biceps"
+    ],
+    "function": "horizontal_pull",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBTBarRow",
+    "name": "T-Bar Row",
+    "exrx_url": "https://exrx.net/WeightExercises/BackGeneral/BBTBarRow",
+    "primary_muscles": [
+      "mid_back",
+      "lats"
+    ],
+    "function": "horizontal_pull",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBLatPulldown",
+    "name": "Lat Pulldown",
+    "exrx_url": "https://exrx.net/WeightExercises/LatissimusDorsi/CBLatPulldown",
+    "primary_muscles": [
+      "lats",
+      "biceps"
+    ],
+    "function": "vertical_pull",
+    "equipment": [
+      "cables",
+      "machines"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBUnderhandPulldown",
+    "name": "Close-Grip Lat Pulldown",
+    "exrx_url": "https://exrx.net/WeightExercises/LatissimusDorsi/CBUnderhandPulldown",
+    "primary_muscles": [
+      "lats",
+      "biceps"
+    ],
+    "function": "vertical_pull",
+    "equipment": [
+      "cables",
+      "machines"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BWPullup",
+    "name": "Pull-Up",
+    "exrx_url": "https://exrx.net/WeightExercises/LatissimusDorsi/BWPullup",
+    "primary_muscles": [
+      "lats",
+      "biceps",
+      "mid_back"
+    ],
+    "function": "vertical_pull",
+    "equipment": [
+      "bodyweight"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BWChinup",
+    "name": "Chin-Up",
+    "exrx_url": "https://exrx.net/WeightExercises/LatissimusDorsi/BWChinup",
+    "primary_muscles": [
+      "lats",
+      "biceps"
+    ],
+    "function": "vertical_pull",
+    "equipment": [
+      "bodyweight"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBStraightArmPulldown",
+    "name": "Straight-Arm Pulldown",
+    "exrx_url": "https://exrx.net/WeightExercises/LatissimusDorsi/CBStraightArmPulldown",
+    "primary_muscles": [
+      "lats"
+    ],
+    "function": "vertical_pull",
+    "equipment": [
+      "cables"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBCablePullover",
+    "name": "Cable Pullover",
+    "exrx_url": "https://exrx.net/WeightExercises/LatissimusDorsi/CBCablePullover",
+    "primary_muscles": [
+      "lats"
+    ],
+    "function": "vertical_pull",
+    "equipment": [
+      "cables"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBFacePull",
+    "name": "Face Pull (Cable)",
+    "exrx_url": "https://exrx.net/WeightExercises/DeltoidPosterior/CBFacePull",
+    "primary_muscles": [
+      "rear_delts",
+      "traps"
+    ],
+    "function": "horizontal_pull",
+    "equipment": [
+      "cables"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBProneInclineRow",
+    "name": "Chest-Supported DB Row",
+    "exrx_url": "https://exrx.net/WeightExercises/BackGeneral/DBProneInclineRow",
+    "primary_muscles": [
+      "mid_back",
+      "lats",
+      "rear_delts"
+    ],
+    "function": "horizontal_pull",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBMilitaryPress",
+    "name": "Overhead Press (Barbell)",
+    "exrx_url": "https://exrx.net/WeightExercises/DeltoidAnterior/BBMilitaryPress",
+    "primary_muscles": [
+      "front_delts",
+      "side_delts",
+      "triceps"
+    ],
+    "function": "vertical_push",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBShoulderPress",
+    "name": "Seated DB Shoulder Press",
+    "exrx_url": "https://exrx.net/WeightExercises/DeltoidAnterior/DBShoulderPress",
+    "primary_muscles": [
+      "front_delts",
+      "side_delts",
+      "triceps"
+    ],
+    "function": "vertical_push",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:LVShoulderPress",
+    "name": "Machine Shoulder Press",
+    "exrx_url": "https://exrx.net/WeightExercises/DeltoidAnterior/LVShoulderPress",
+    "primary_muscles": [
+      "front_delts",
+      "side_delts",
+      "triceps"
+    ],
+    "function": "vertical_push",
+    "equipment": [
+      "machines"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBLateralRaise",
+    "name": "DB Lateral Raise",
+    "exrx_url": "https://exrx.net/WeightExercises/DeltoidLateral/DBLateralRaise",
+    "primary_muscles": [
+      "side_delts"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBLateralRaise",
+    "name": "Cable Lateral Raise",
+    "exrx_url": "https://exrx.net/WeightExercises/DeltoidLateral/CBLateralRaise",
+    "primary_muscles": [
+      "side_delts"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "cables"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBFrontRaise",
+    "name": "DB Front Raise",
+    "exrx_url": "https://exrx.net/WeightExercises/DeltoidAnterior/DBFrontRaise",
+    "primary_muscles": [
+      "front_delts"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBRearDeltRaise",
+    "name": "Rear Delt Fly (DB)",
+    "exrx_url": "https://exrx.net/WeightExercises/DeltoidPosterior/DBRearDeltRaise",
+    "primary_muscles": [
+      "rear_delts",
+      "mid_back"
+    ],
+    "function": "horizontal_pull",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:LVRearDeltFly",
+    "name": "Reverse Pec Deck",
+    "exrx_url": "https://exrx.net/WeightExercises/DeltoidPosterior/LVRearDeltFly",
+    "primary_muscles": [
+      "rear_delts",
+      "mid_back"
+    ],
+    "function": "horizontal_pull",
+    "equipment": [
+      "machines"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:SMShoulderPress",
+    "name": "Smith Machine Overhead Press",
+    "exrx_url": "https://exrx.net/WeightExercises/DeltoidAnterior/SMShoulderPress",
+    "primary_muscles": [
+      "front_delts",
+      "side_delts",
+      "triceps"
+    ],
+    "function": "vertical_push",
+    "equipment": [
+      "machines"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBArnoldPress",
+    "name": "Arnold Press (DB)",
+    "exrx_url": "https://exrx.net/WeightExercises/DeltoidAnterior/DBArnoldPress",
+    "primary_muscles": [
+      "front_delts",
+      "side_delts",
+      "triceps"
+    ],
+    "function": "vertical_push",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBUprightRow",
+    "name": "Barbell Upright Row",
+    "exrx_url": "https://exrx.net/WeightExercises/DeltoidLateral/BBUprightRow",
+    "primary_muscles": [
+      "side_delts",
+      "traps"
+    ],
+    "function": "vertical_pull",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBBackSquat",
+    "name": "Back Squat",
+    "exrx_url": "https://exrx.net/WeightExercises/Quadriceps/BBBackSquat",
+    "primary_muscles": [
+      "quads",
+      "glutes"
+    ],
+    "function": "knee_dominant",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBFrontSquat",
+    "name": "Front Squat",
+    "exrx_url": "https://exrx.net/WeightExercises/Quadriceps/BBFrontSquat",
+    "primary_muscles": [
+      "quads",
+      "glutes",
+      "erectors"
+    ],
+    "function": "knee_dominant",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBGobletSquat",
+    "name": "Goblet Squat",
+    "exrx_url": "https://exrx.net/WeightExercises/Quadriceps/DBGobletSquat",
+    "primary_muscles": [
+      "quads",
+      "glutes"
+    ],
+    "function": "knee_dominant",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:SLHackSquat",
+    "name": "Hack Squat (Machine)",
+    "exrx_url": "https://exrx.net/WeightExercises/Quadriceps/SLHackSquat",
+    "primary_muscles": [
+      "quads",
+      "glutes"
+    ],
+    "function": "knee_dominant",
+    "equipment": [
+      "machines"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:LV45LegPress",
+    "name": "Leg Press (45°)",
+    "exrx_url": "https://exrx.net/WeightExercises/Quadriceps/LV45LegPress",
+    "primary_muscles": [
+      "quads",
+      "glutes"
+    ],
+    "function": "knee_dominant",
+    "equipment": [
+      "machines"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBSingleLegSplitSquat",
+    "name": "Bulgarian Split Squat (DB)",
+    "exrx_url": "https://exrx.net/WeightExercises/Quadriceps/DBSingleLegSplitSquat",
+    "primary_muscles": [
+      "quads",
+      "glutes"
+    ],
+    "function": "knee_dominant",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBLungeWalk",
+    "name": "Walking Lunge (DB)",
+    "exrx_url": "https://exrx.net/WeightExercises/Quadriceps/DBLungeWalk",
+    "primary_muscles": [
+      "quads",
+      "glutes"
+    ],
+    "function": "knee_dominant",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:SMFrontSquat",
+    "name": "Smith Machine Squat",
+    "exrx_url": "https://exrx.net/WeightExercises/Quadriceps/SMFrontSquat",
+    "primary_muscles": [
+      "quads",
+      "glutes"
+    ],
+    "function": "knee_dominant",
+    "equipment": [
+      "machines"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:LVLegExtension",
+    "name": "Leg Extension",
+    "exrx_url": "https://exrx.net/WeightExercises/Quadriceps/LVLegExtension",
+    "primary_muscles": [
+      "quads"
+    ],
+    "function": "knee_extension",
+    "equipment": [
+      "machines"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBStepUp",
+    "name": "DB Step-Up",
+    "exrx_url": "https://exrx.net/WeightExercises/GluteusMaximus/DBStepUp",
+    "primary_muscles": [
+      "glutes",
+      "quads"
+    ],
+    "function": "knee_dominant",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBLunge",
+    "name": "Reverse Lunge (DB)",
+    "exrx_url": "https://exrx.net/WeightExercises/Quadriceps/DBLunge",
+    "primary_muscles": [
+      "quads",
+      "glutes"
+    ],
+    "function": "knee_dominant",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:SMLunge",
+    "name": "Smith Machine Lunge",
+    "exrx_url": "https://exrx.net/WeightExercises/Quadriceps/SMLunge",
+    "primary_muscles": [
+      "quads",
+      "glutes"
+    ],
+    "function": "knee_dominant",
+    "equipment": [
+      "machines"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BWSissySquat",
+    "name": "Sissy Squat (BW)",
+    "exrx_url": "https://exrx.net/WeightExercises/Quadriceps/BWSissySquat",
+    "primary_muscles": [
+      "quads"
+    ],
+    "function": "knee_dominant",
+    "equipment": [
+      "bodyweight"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:RomanianDeadlift",
+    "name": "Romanian Deadlift (Bar)",
+    "exrx_url": "https://exrx.net/WeightExercises/OlympicLifts/RomanianDeadlift",
+    "primary_muscles": [
+      "hamstrings",
+      "glutes",
+      "erectors"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBStrBackStrLegDeadlift",
+    "name": "Romanian Deadlift (DB)",
+    "exrx_url": "https://exrx.net/WeightExercises/Hamstrings/DBStrBackStrLegDeadlift",
+    "primary_muscles": [
+      "hamstrings",
+      "glutes",
+      "erectors"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:KBRomanianDeadlift",
+    "name": "Romanian Deadlift (Kettlebell)",
+    "exrx_url": "https://exrx.net/WeightExercises/ErectorSpinae/KBRomanianDeadlift",
+    "primary_muscles": [
+      "hamstrings",
+      "glutes",
+      "erectors"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "kettlebells"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBDeadlift",
+    "name": "Conventional Deadlift",
+    "exrx_url": "https://exrx.net/WeightExercises/BackGeneral/BBDeadlift",
+    "primary_muscles": [
+      "glutes",
+      "hamstrings",
+      "erectors",
+      "traps"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBHipThrust",
+    "name": "Hip Thrust (Barbell)",
+    "exrx_url": "https://exrx.net/WeightExercises/GluteusMaximus/BBHipThrust",
+    "primary_muscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:LVHipThrust",
+    "name": "Hip Thrust (Machine)",
+    "exrx_url": "https://exrx.net/WeightExercises/GluteusMaximus/LVHipThrust",
+    "primary_muscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "machines"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBGoodMorning",
+    "name": "Good Morning (Barbell)",
+    "exrx_url": "https://exrx.net/WeightExercises/BackGeneral/BBGoodMorning",
+    "primary_muscles": [
+      "hamstrings",
+      "glutes",
+      "erectors"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBPullThrough",
+    "name": "Cable Pull-Through",
+    "exrx_url": "https://exrx.net/WeightExercises/GluteusMaximus/CBPullThrough",
+    "primary_muscles": [
+      "glutes",
+      "hamstrings"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "cables"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:LVSeatedLegCurl",
+    "name": "Seated Leg Curl",
+    "exrx_url": "https://exrx.net/WeightExercises/Hamstrings/LVSeatedLegCurl",
+    "primary_muscles": [
+      "hamstrings"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "machines"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:LVLyingLegCurl",
+    "name": "Lying Leg Curl",
+    "exrx_url": "https://exrx.net/WeightExercises/Hamstrings/LVLyingLegCurl",
+    "primary_muscles": [
+      "hamstrings"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "machines"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BWNordicHamstringCurl",
+    "name": "Nordic Hamstring Curl",
+    "exrx_url": "https://exrx.net/WeightExercises/Hamstrings/BWNordicHamstringCurl",
+    "primary_muscles": [
+      "hamstrings"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "bodyweight"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBBackExtension",
+    "name": "Back Extension (Hyperextension)",
+    "exrx_url": "https://exrx.net/WeightExercises/ErectorSpinae/BBBackExtension",
+    "primary_muscles": [
+      "erectors",
+      "glutes",
+      "hamstrings"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "machines",
+      "bodyweight"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBCurl",
+    "name": "Barbell Curl",
+    "exrx_url": "https://exrx.net/WeightExercises/Biceps/BBCurl",
+    "primary_muscles": [
+      "biceps"
+    ],
+    "function": "elbow_flexion",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBCurl",
+    "name": "Dumbbell Curl",
+    "exrx_url": "https://exrx.net/WeightExercises/Biceps/DBCurl",
+    "primary_muscles": [
+      "biceps"
+    ],
+    "function": "elbow_flexion",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBInclineCurl",
+    "name": "Incline DB Curl",
+    "exrx_url": "https://exrx.net/WeightExercises/Biceps/DBInclineCurl",
+    "primary_muscles": [
+      "biceps"
+    ],
+    "function": "elbow_flexion",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBCurl",
+    "name": "Cable Curl",
+    "exrx_url": "https://exrx.net/WeightExercises/Biceps/CBCurl",
+    "primary_muscles": [
+      "biceps"
+    ],
+    "function": "elbow_flexion",
+    "equipment": [
+      "cables"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:LVPreacherCurl",
+    "name": "Preacher Curl (Machine)",
+    "exrx_url": "https://exrx.net/WeightExercises/Biceps/LVPreacherCurl",
+    "primary_muscles": [
+      "biceps"
+    ],
+    "function": "elbow_flexion",
+    "equipment": [
+      "machines"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBHammerCurl",
+    "name": "Hammer Curl (DB)",
+    "exrx_url": "https://exrx.net/WeightExercises/Brachialis/DBHammerCurl",
+    "primary_muscles": [
+      "biceps",
+      "brachialis",
+      "forearms"
+    ],
+    "function": "elbow_flexion",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBCurlEZ",
+    "name": "EZ-Bar Curl",
+    "exrx_url": "https://exrx.net/WeightExercises/Biceps/BBCurlEZ",
+    "primary_muscles": [
+      "biceps"
+    ],
+    "function": "elbow_flexion",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBHammerCurl",
+    "name": "Cable Hammer Curl (Rope)",
+    "exrx_url": "https://exrx.net/WeightExercises/Brachialis/CBHammerCurl",
+    "primary_muscles": [
+      "biceps",
+      "brachialis"
+    ],
+    "function": "elbow_flexion",
+    "equipment": [
+      "cables"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBConcentrationCurl",
+    "name": "Concentration Curl (DB)",
+    "exrx_url": "https://exrx.net/WeightExercises/Biceps/DBConcentrationCurl",
+    "primary_muscles": [
+      "biceps"
+    ],
+    "function": "elbow_flexion",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBCloseGripBenchPress",
+    "name": "Close-Grip Bench Press",
+    "exrx_url": "https://exrx.net/WeightExercises/Triceps/BBCloseGripBenchPress",
+    "primary_muscles": [
+      "triceps",
+      "chest"
+    ],
+    "function": "horizontal_push",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BWChairDip",
+    "name": "Dips (Assisted/Weighted)",
+    "exrx_url": "https://exrx.net/WeightExercises/Triceps/BWChairDip",
+    "primary_muscles": [
+      "triceps",
+      "chest"
+    ],
+    "function": "vertical_push",
+    "equipment": [
+      "bodyweight",
+      "machines",
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBPushdown",
+    "name": "Cable Triceps Pushdown",
+    "exrx_url": "https://exrx.net/WeightExercises/Triceps/CBPushdown",
+    "primary_muscles": [
+      "triceps"
+    ],
+    "function": "elbow_extension",
+    "equipment": [
+      "cables"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBOneArmOverheadExtension",
+    "name": "Overhead Triceps Extension (Cable)",
+    "exrx_url": "https://exrx.net/WeightExercises/Triceps/CBOneArmOverheadExtension",
+    "primary_muscles": [
+      "triceps"
+    ],
+    "function": "elbow_extension",
+    "equipment": [
+      "cables"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBLyingTricepsExtension",
+    "name": "Lying Triceps Extension (Skullcrusher)",
+    "exrx_url": "https://exrx.net/WeightExercises/Triceps/BBLyingTricepsExtension",
+    "primary_muscles": [
+      "triceps"
+    ],
+    "function": "elbow_extension",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBOneArmOverheadExtension",
+    "name": "Overhead Triceps Extension (DB)",
+    "exrx_url": "https://exrx.net/WeightExercises/Triceps/DBOneArmOverheadExtension",
+    "primary_muscles": [
+      "triceps"
+    ],
+    "function": "elbow_extension",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:LVStandingCalfRaise",
+    "name": "Standing Calf Raise (Machine)",
+    "exrx_url": "https://exrx.net/WeightExercises/Gastrocnemius/LVStandingCalfRaise",
+    "primary_muscles": [
+      "calves"
+    ],
+    "function": "calf_raise",
+    "equipment": [
+      "machines"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:LVSeatedCalfRaise",
+    "name": "Seated Calf Raise (Machine)",
+    "exrx_url": "https://exrx.net/WeightExercises/Soleus/LVSeatedCalfRaise",
+    "primary_muscles": [
+      "calves"
+    ],
+    "function": "calf_raise",
+    "equipment": [
+      "machines"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:SMCalfRaise",
+    "name": "Smith Machine Calf Raise",
+    "exrx_url": "https://exrx.net/WeightExercises/Gastrocnemius/SMCalfRaise",
+    "primary_muscles": [
+      "calves"
+    ],
+    "function": "calf_raise",
+    "equipment": [
+      "machines"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBSingleLegCalfRaise",
+    "name": "Single-Leg Calf Raise (DB)",
+    "exrx_url": "https://exrx.net/WeightExercises/Gastrocnemius/DBSingleLegCalfRaise",
+    "primary_muscles": [
+      "calves"
+    ],
+    "function": "calf_raise",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:LVDonkeyCalfRaise",
+    "name": "Donkey Calf Raise (Machine)",
+    "exrx_url": "https://exrx.net/WeightExercises/Gastrocnemius/LVDonkeyCalfRaise",
+    "primary_muscles": [
+      "calves"
+    ],
+    "function": "calf_raise",
+    "equipment": [
+      "machines"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BWHangingLegHipRaise",
+    "name": "Hanging Leg Raise",
+    "exrx_url": "https://exrx.net/WeightExercises/RectusAbdominis/BWHangingLegHipRaise",
+    "primary_muscles": [
+      "abs",
+      "hip_flexors"
+    ],
+    "function": "anti_extension",
+    "equipment": [
+      "bodyweight"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBCrunch",
+    "name": "Cable Crunch",
+    "exrx_url": "https://exrx.net/WeightExercises/RectusAbdominis/CBCrunch",
+    "primary_muscles": [
+      "abs"
+    ],
+    "function": "anti_extension",
+    "equipment": [
+      "cables"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:ABRollout",
+    "name": "Ab Wheel Rollout",
+    "exrx_url": "https://exrx.net/WeightExercises/RectusAbdominis/ABRollout",
+    "primary_muscles": [
+      "abs"
+    ],
+    "function": "anti_extension",
+    "equipment": [
+      "bodyweight"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BWPlank",
+    "name": "Plank",
+    "exrx_url": "https://exrx.net/WeightExercises/RectusAbdominis/BWPlank",
+    "primary_muscles": [
+      "abs"
+    ],
+    "function": "anti_extension",
+    "equipment": [
+      "bodyweight"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BWSidePlank",
+    "name": "Side Plank",
+    "exrx_url": "https://exrx.net/WeightExercises/Obliques/BWSidePlank",
+    "primary_muscles": [
+      "obliques"
+    ],
+    "function": "anti_rotation",
+    "equipment": [
+      "bodyweight"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBPallofPress",
+    "name": "Pallof Press (Cable)",
+    "exrx_url": "https://exrx.net/WeightExercises/Obliques/CBPallofPress",
+    "primary_muscles": [
+      "obliques",
+      "abs"
+    ],
+    "function": "anti_rotation",
+    "equipment": [
+      "cables"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBWoodChop",
+    "name": "Cable Woodchop",
+    "exrx_url": "https://exrx.net/WeightExercises/Obliques/CBWoodChop",
+    "primary_muscles": [
+      "obliques"
+    ],
+    "function": "rotation",
+    "equipment": [
+      "cables"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:CBKneelingCableCrunch",
+    "name": "Kneeling Cable Crunch",
+    "exrx_url": "https://exrx.net/WeightExercises/RectusAbdominis/CBKneelingCableCrunch",
+    "primary_muscles": [
+      "abs"
+    ],
+    "function": "anti_extension",
+    "equipment": [
+      "cables"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BWReverseCrunch",
+    "name": "Reverse Crunch",
+    "exrx_url": "https://exrx.net/WeightExercises/RectusAbdominis/BWReverseCrunch",
+    "primary_muscles": [
+      "abs"
+    ],
+    "function": "anti_extension",
+    "equipment": [
+      "bodyweight"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BWHangingKneeRaise",
+    "name": "Hanging Knee Raise",
+    "exrx_url": "https://exrx.net/WeightExercises/RectusAbdominis/BWHangingKneeRaise",
+    "primary_muscles": [
+      "abs",
+      "hip_flexors"
+    ],
+    "function": "anti_extension",
+    "equipment": [
+      "bodyweight"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:BBShrug",
+    "name": "Barbell Shrug",
+    "exrx_url": "https://exrx.net/WeightExercises/TrapeziusUpper/BBShrug",
+    "primary_muscles": [
+      "traps"
+    ],
+    "function": "vertical_pull",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBShrug",
+    "name": "Dumbbell Shrug",
+    "exrx_url": "https://exrx.net/WeightExercises/TrapeziusUpper/DBShrug",
+    "primary_muscles": [
+      "traps"
+    ],
+    "function": "vertical_pull",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBFarmersWalk",
+    "name": "Farmer's Carry (DB)",
+    "exrx_url": "https://exrx.net/WeightExercises/DeltoidAnterior/DBFarmersWalk",
+    "primary_muscles": [
+      "forearms",
+      "traps",
+      "core"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBWristCurl",
+    "name": "Wrist Curl",
+    "exrx_url": "https://exrx.net/WeightExercises/WristFlexors/DBWristCurl",
+    "primary_muscles": [
+      "forearms"
+    ],
+    "function": "elbow_flexion",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBReverseWristCurl",
+    "name": "Reverse Wrist Curl",
+    "exrx_url": "https://exrx.net/WeightExercises/WristExtensors/DBReverseWristCurl",
+    "primary_muscles": [
+      "forearms"
+    ],
+    "function": "elbow_extension",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "isolation",
+    "enriched": false
+  },
+  {
+    "id": "exrx:PowerClean",
+    "name": "Power Clean",
+    "exrx_url": "https://exrx.net/WeightExercises/OlympicLifts/PowerClean",
+    "primary_muscles": [
+      "glutes",
+      "quads",
+      "traps"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "barbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:DBSnatch",
+    "name": "Dumbbell Snatch",
+    "exrx_url": "https://exrx.net/WeightExercises/OlympicLifts/DBSnatch",
+    "primary_muscles": [
+      "glutes",
+      "quads",
+      "traps",
+      "delts"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "dumbbell"
+    ],
+    "type": "compound",
+    "enriched": false
+  },
+  {
+    "id": "exrx:KBSwing",
+    "name": "Kettlebell Swing",
+    "exrx_url": "https://exrx.net/WeightExercises/GluteusMaximus/KBSwing",
+    "primary_muscles": [
+      "glutes",
+      "hamstrings",
+      "erectors"
+    ],
+    "function": "hip_dominant",
+    "equipment": [
+      "kettlebells"
+    ],
+    "type": "compound",
+    "enriched": false
+  }
+]
