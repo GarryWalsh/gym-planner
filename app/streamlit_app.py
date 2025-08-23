@@ -11,11 +11,13 @@ from app.models import UserProfile
 from app.models.exercise import Equipment
 from app.services.allowed_exercises import shortlist
 from app.services.catalog import load_catalog
-from app.services.export import to_csv, to_markdown
+from app.services.export import to_csv, to_markdown, to_pdf
 from app.services.planner_local import replace_one_exercise
 from app.config import get_settings
+from app.services.llm_jobs import explain_plan_llm, replace_exercise_llm
 
 st.set_page_config(page_title="Gym Planner", page_icon="🏋️", layout="wide")
+settings = get_settings()
 
 
 def get_all_muscles() -> List[str]:
@@ -50,19 +52,34 @@ with st.sidebar:
     default_sets = st.slider("Default sets", 2, 6, 3)
     default_reps = st.slider("Default reps", 3, 15, 10)
     rest_seconds = st.slider("Rest (seconds)", 30, 240, 90, step=15)
-    supersets_enabled = st.toggle("Supersets enabled", value=False)
-    progressive_overload = st.toggle("Progressive overload", value=False)
+
+    # Helper: pill groups (fallback to multiselect if unavailable)
+    def pills_or_multiselect(label: str, options: List[str], default: List[str]) -> List[str]:
+        try:
+            pills_fn = getattr(st, "pills", None)
+            if pills_fn:
+                try:
+                    result = pills_fn(label, options=options, selection=default)
+                except TypeError:
+                    # older signature
+                    result = pills_fn(label, options, default=default)
+                # If the widget returns a non-list (e.g., single selection), fall back to multiselect for multi-choice UX
+                if not isinstance(result, (list, tuple, set)):
+                    raise TypeError("pills returned single selection; need multi-select")
+                return list(result)
+        except Exception:
+            pass
+        return st.multiselect(label, options, default=default)
 
     equipment_all = list(Equipment.__args__)  # type: ignore[attr-defined]
-    allowed_equipment = st.multiselect("Allowed equipment (optional)", equipment_all, default=[])
-    blacklisted_equipment = st.multiselect("Blacklisted equipment (optional)", equipment_all, default=[])
+    selected_equipment = pills_or_multiselect("Equipment", equipment_all, equipment_all)
 
     muscles_all = get_all_muscles()
-    emphasis_sel = st.multiselect("Emphasis muscles (checkbox)", muscles_all, default=[])
-    blacklisted_muscles = st.multiselect("Blacklisted muscles (optional)", muscles_all, default=[])
+    selected_muscles = pills_or_multiselect("Muscles", muscles_all, muscles_all)
 
-    # Build emphasis map 0/1
-    emphasis_map: Dict[str, int] = {m: (1 if m in emphasis_sel else 0) for m in muscles_all}
+    # Build emphasis map 0/1 from selected muscles and derive blacklist as complement
+    emphasis_map: Dict[str, int] = {m: (1 if m in selected_muscles else 0) for m in muscles_all}
+    blacklisted_muscles = [m for m in muscles_all if m not in selected_muscles]
 
     profile = UserProfile(
         goal=goal,
@@ -72,31 +89,25 @@ with st.sidebar:
         default_sets=default_sets,
         default_reps=default_reps,
         rest_seconds=rest_seconds,
-        supersets_enabled=supersets_enabled,
-        progressive_overload=progressive_overload,
-        allowed_equipment=allowed_equipment,  # type: ignore[arg-type]
-        blacklisted_equipment=blacklisted_equipment,  # type: ignore[arg-type]
+        allowed_equipment=selected_equipment,  # type: ignore[arg-type]
+        blacklisted_equipment=[],  # single selector UX; blacklist derived from deselection if needed
         emphasis=emphasis_map,
         blacklisted_muscles=blacklisted_muscles,
         blacklisted_exercise_ids=[],
     )
 
-    col_a, col_b = st.columns(2)
-    with col_a:
-        if st.button("Generate plan", use_container_width=True):
-            ids = shortlist(profile)
-            if not ids:
-                st.error("No exercises available with the current constraints. Adjust filters and try again.")
-            else:
-                graph = PlanGraph()
-                state = graph.invoke(profile)
-                st.session_state["plan"] = state["plan_res"].plan  # type: ignore[index]
-                st.session_state["profile"] = profile
-                st.toast("Plan generated.")
-    with col_b:
-        if st.button("Regenerate (clear)", use_container_width=True):
-            st.session_state["plan"] = None
-            st.session_state["profile"] = None
+    if st.button("Generate plan", use_container_width=True):
+        ids = shortlist(profile)
+        if not ids:
+            st.error("No exercises available with the current constraints. Adjust filters and try again.")
+        else:
+            import time as _time
+            graph = PlanGraph()
+            seed = int(_time.time() * 1000) & 0x7FFFFFFF
+            state = graph.invoke(profile, seed=seed)
+            st.session_state["plan"] = state["plan_res"].plan  # type: ignore[index]
+            st.session_state["profile"] = profile
+            st.toast("Plan generated.")
 
 plan = st.session_state.get("plan")
 current_profile: UserProfile | None = st.session_state.get("profile")
@@ -106,22 +117,128 @@ if plan is None:
 else:
     st.subheader(f"Plan — {len(plan.days)} days (Profile {profile_hash(current_profile)})")
 
-    # Downloads
+    # Single-row actions: plan options left, export right
     csv_bytes = to_csv(plan)
     md_text = to_markdown(plan)
-    col1, col2, col3 = st.columns([1,1,6])
-    with col1:
-        st.download_button("Download CSV", data=csv_bytes, file_name="gym_plan.csv", mime="text/csv")
-    with col2:
-        st.download_button("Download Markdown", data=md_text, file_name="gym_plan.md", mime="text/markdown")
+    pdf_bytes = b""
+    pdf_error = None
+    try:
+        pdf_bytes = to_pdf(plan)
+    except Exception as _e:  # pragma: no cover
+        pdf_error = str(_e)
 
-    # Simple local explanation
+    left1, left2, spacer, right1, right2, right3 = st.columns([1, 1, 6, 1, 1, 1])
+    with left1:
+        if st.button("🔁 Regenerate plan", key="btn-regenerate", use_container_width=True):
+            ids = shortlist(profile)
+            if not ids:
+                st.error("No exercises available with the current constraints. Adjust filters and try again.")
+            else:
+                import time as _time
+                graph = PlanGraph()
+                seed = int(_time.time() * 1000) & 0x7FFFFFFF
+                state = graph.invoke(profile, seed=seed)
+                st.session_state["plan"] = state["plan_res"].plan  # type: ignore[index]
+                st.session_state["profile"] = profile
+                st.toast("Plan regenerated.")
+                st.rerun()
+    with left2:
+        if st.button("🧹 Clear plan", key="btn-clear", use_container_width=True):
+            st.session_state["plan"] = None
+            st.session_state["profile"] = None
+            st.toast("Cleared.")
+            st.rerun()
+    with right1:
+        st.download_button("📄 CSV", data=csv_bytes, file_name="gym_plan.csv", mime="text/csv")
+    with right2:
+        st.download_button("📝 Markdown", data=md_text, file_name="gym_plan.md", mime="text/markdown")
+    with right3:
+        if pdf_bytes:
+            st.download_button("📘 PDF", data=pdf_bytes, file_name="gym_plan.pdf", mime="application/pdf")
+        elif pdf_error:
+            st.caption("PDF unavailable: " + pdf_error)
+
+    # Fitness Q&A (strictly validated)
+    st.markdown("\n")
+    with st.container():
+        st.subheader("Ask about your plan")
+        q = st.text_input("Question (fitness topics only)", value="", placeholder="e.g., Which days train chest? How many sets are in this plan?", key="qa-input")
+        ask = st.button("❓ Ask", key="qa-ask")
+        if ask:
+            def _is_valid_question(text: str) -> tuple[bool, str | None]:
+                t = (text or "").strip()
+                if len(t) < 5 or len(t) > 300:
+                    return False, "Please enter a concise question (5–300 chars)."
+                lower = t.lower()
+                # No URLs/emails
+                if "http://" in lower or "https://" in lower or "www." in lower or "@" in lower:
+                    return False, "Links, emails, or external references are not allowed."
+                # Require fitness-related keywords or muscles
+                fitness_kw = {
+                    "exercise","exercises","set","sets","rep","reps","rest","muscle","muscles",
+                    "volume","frequency","intensity","superset","warmup","cooldown","day","plan",
+                    "chest","back","legs","shoulders","biceps","triceps","quads","hamstrings","glutes","calves","core","abs"
+                }
+                has_kw = any(k in lower for k in fitness_kw)
+                return (True, None) if has_kw else (False, "Only fitness-related questions are allowed.")
+
+            ok, err = _is_valid_question(q)
+            if not ok:
+                st.error(err)
+            else:
+                # Build a safe local answer based on the current plan
+                def _answer(text: str) -> str:
+                    lower = text.lower()
+                    lines = []
+                    # Summaries per day
+                    if any(x in lower for x in ["day","which","when"]):
+                        for day in plan.days:
+                            musc = sorted({m for ex in day.exercises for m in ex.primary_muscles})
+                            lines.append(f"Day {day.day_index+1} ({day.label}) covers: {', '.join(musc)}")
+                    # Muscles mentioned
+                    muscles = sorted({m.lower() for d in plan.days for ex in d.exercises for m in ex.primary_muscles}) if plan.days else []
+                    target_muscles = [m for m in muscles if m in lower]
+                    if target_muscles:
+                        for tm in target_muscles:
+                            hits = []
+                            for day in plan.days:
+                                exes = [ex.name for ex in day.exercises if tm in [mm.lower() for mm in ex.primary_muscles]]
+                                if exes:
+                                    hits.append(f"Day {day.day_index+1}: " + ", ".join(exes))
+                            if hits:
+                                lines.append(f"Muscle '{tm}' appears in → " + " | ".join(hits))
+                    # Sets/reps/rest
+                    if any(x in lower for x in ["set","sets","rep","reps","rest"]):
+                        if plan.days:
+                            d0 = plan.days[0]
+                            lines.append(f"Default prescription: {d0.sets} sets × {d0.reps} reps; rest {d0.rest_seconds}s.")
+                    if not lines:
+                        lines.append("This plan is designed around your selections. Try asking about muscles (e.g., chest), days, or sets/reps/rest.")
+                    return "\n".join(lines)
+
+                st.info(_answer(q))
+
+    # Explanation (LLM if available, else local summary)
     with st.expander("Explanation", expanded=False):
-        overall = f"This plan targets your goal of {current_profile.goal} with {len(plan.days)} sessions focusing on variety and your emphasized muscles."
-        day_summaries = []
-        for day in plan.days:
-            musc = sorted({m for ex in day.exercises for m in ex.primary_muscles})
-            day_summaries.append(f"Day {day.day_index+1} covers: {', '.join(musc)}")
+        overall: str
+        day_summaries: List[str]
+        if settings.GROQ_API_KEY:
+            try:
+                exr = explain_plan_llm(current_profile, plan)  # type: ignore[arg-type]
+                overall = exr.overall
+                day_summaries = exr.day_summaries
+            except Exception:
+                day_summaries = []
+                overall = f"This plan targets your goal of {current_profile.goal} with {len(plan.days)} sessions focusing on variety and your emphasized muscles."
+                for day in plan.days:
+                    musc = sorted({m for ex in day.exercises for m in ex.primary_muscles})
+                    day_summaries.append(f"Day {day.day_index+1} covers: {', '.join(musc)}")
+        else:
+            day_summaries = []
+            overall = f"This plan targets your goal of {current_profile.goal} with {len(plan.days)} sessions focusing on variety and your emphasized muscles."
+            for day in plan.days:
+                musc = sorted({m for ex in day.exercises for m in ex.primary_muscles})
+                day_summaries.append(f"Day {day.day_index+1} covers: {', '.join(musc)}")
         st.write(overall)
         for s in day_summaries:
             st.write("- " + s)
@@ -131,7 +248,7 @@ else:
     for day in plan.days:
         with st.expander(f"Day {day.day_index + 1}: {day.label}"):
             st.caption(f"Sets: {day.sets}  Reps: {day.reps}  Rest: {day.rest_seconds}s")
-            for ex in day.exercises:
+            for idx, ex in enumerate(day.exercises):
                 cols = st.columns([5, 3, 2])
                 with cols[0]:
                     st.markdown(f"**[{ex.name}]({ex.exrx_url})**")
@@ -139,16 +256,19 @@ else:
                 with cols[1]:
                     st.empty()
                 with cols[2]:
-                    if st.button("Change", key=f"chg-{day.day_index}-{ex.id}"):
+                    if st.button("Change", key=f"chg-{day.day_index}-{idx}-{ex.id}"):
                         allowed_ids = shortlist(current_profile)
-                        st.session_state["plan"] = replace_one_exercise(
-                            current_profile, st.session_state["plan"], day.day_index, ex.id, allowed_ids
-                        )
+                        if settings.GROQ_API_KEY:
+                            try:
+                                st.session_state["plan"] = replace_exercise_llm(
+                                    current_profile, st.session_state["plan"], day.day_index, ex.id, allowed_ids
+                                )
+                            except Exception:
+                                st.session_state["plan"] = replace_one_exercise(
+                                    current_profile, st.session_state["plan"], day.day_index, ex.id, allowed_ids
+                                )
+                        else:
+                            st.session_state["plan"] = replace_one_exercise(
+                                current_profile, st.session_state["plan"], day.day_index, ex.id, allowed_ids
+                            )
                         st.rerun()
-
-st.markdown("---")
-settings = get_settings()
-if settings.GROQ_API_KEY:
-    st.caption("LLM mode enabled — Groq structured outputs for generate/validate/repair with local fallback.")
-else:
-    st.caption("Local mode — using built-in planner/validator. Set GROQ_API_KEY to enable LLM.")

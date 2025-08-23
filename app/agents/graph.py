@@ -33,13 +33,19 @@ class PlanGraph:
     def __init__(self) -> None:
         self.settings = get_settings()
 
-    def invoke(self, profile: UserProfile) -> Dict[str, Any]:
+    def invoke(self, profile: UserProfile, seed: int | None = None) -> Dict[str, Any]:
+        import random
         state = GraphState()
         # allowed_list
         state.allowed_req = AllowedListRequest(profile=profile)
         state.allowed_res = allowed_list_node(state.allowed_req)
+        # Optional shuffle of allowed ids to diversify plans
+        allowed_ids = list(state.allowed_res.exercise_ids)
+        if seed is not None:
+            rnd = random.Random(seed)
+            rnd.shuffle(allowed_ids)
         # plan_generate
-        state.plan_req = PlanRequest(profile=profile, allowed_exercise_ids=state.allowed_res.exercise_ids)
+        state.plan_req = PlanRequest(profile=profile, allowed_exercise_ids=allowed_ids)
         state.plan_res = plan_generate_node(state.plan_req)
         # validate and repair loop
         iter_left = self.settings.MAX_REPAIR_ITERATIONS
@@ -54,7 +60,7 @@ class PlanGraph:
             state.repair_req = RepairRequest(
                 profile=profile,
                 plan=state.plan_res.plan,
-                allowed_exercise_ids=state.allowed_res.exercise_ids,
+                allowed_exercise_ids=allowed_ids,
                 issues=state.validation.issues,
             )
             repaired = repair_node(state.repair_req)

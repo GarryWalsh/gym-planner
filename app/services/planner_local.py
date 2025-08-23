@@ -34,34 +34,50 @@ def _compute_weekly_focus(plan: Plan) -> Dict[str, int]:
 def generate_local_plan(profile: UserProfile, allowed_exercise_ids: Sequence[str]) -> Plan:
     catalog = {ex.id: ex for ex in load_catalog()}
 
-    # Pick exercises in order from allowed_exercise_ids ensuring uniqueness, cycling if needed
+    # Pick exercises in order from allowed_exercise_ids; we will allow reuse across days,
+    # but keep uniqueness within a day. We also try to diversify functions when possible.
     allowed = [catalog[eid] for eid in allowed_exercise_ids if eid in catalog]
     if not allowed:
         raise ValueError("No exercises available after applying constraints.")
 
     days: List[DayPlan] = []
     cursor = 0
-    used_ids: set[str] = set()
 
     for d in range(profile.days_per_week):
         day_label = _label_for_day(d, profile.days_per_week)
-        day_exercises = []
+        day_exercises: List = []
+        seen_ids: set[str] = set()
+
+        # Pass 1: prefer unique functions
         attempts = 0
-        while len(day_exercises) < profile.max_exercises_per_day and attempts < len(allowed) * 2:
+        while len(day_exercises) < profile.max_exercises_per_day and attempts < len(allowed) * 3:
             ex = allowed[cursor % len(allowed)]
             cursor += 1
             attempts += 1
-            if ex.id in used_ids:
+            if ex.id in seen_ids:
                 continue
-            # avoid banned muscles redundancy already filtered by shortlist; just ensure variety by function
             if any(e.function == ex.function for e in day_exercises):
                 continue
             day_exercises.append(ex)
-            used_ids.add(ex.id)
-        if not day_exercises:
-            # fallback: at least one exercise
-            day_exercises.append(allowed[cursor % len(allowed)])
+            seen_ids.add(ex.id)
+
+        # Pass 2: relax function diversity to fill remaining slots with unique IDs
+        attempts2 = 0
+        while len(day_exercises) < profile.max_exercises_per_day and attempts2 < len(allowed) * 3:
+            ex = allowed[cursor % len(allowed)]
             cursor += 1
+            attempts2 += 1
+            if ex.id in seen_ids:
+                continue
+            day_exercises.append(ex)
+            seen_ids.add(ex.id)
+
+        # Ensure at least one exercise
+        if not day_exercises:
+            fallback_ex = allowed[cursor % len(allowed)]
+            day_exercises.append(fallback_ex)
+            cursor += 1
+
         day = DayPlan(
             day_index=d,
             label=day_label,

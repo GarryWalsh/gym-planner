@@ -37,14 +37,38 @@ Start the server:
   ```
 
 Notes:
-- Export page is available at the top-right “Pages” menu (2_Export).
+- Download buttons (CSV, Markdown, PDF) appear under the generated plan on the main page (Export page is deprecated and hidden from the sidebar).
 - If GROQ_API_KEY is set, LLM generate/validate/repair are used with structured outputs; otherwise the app falls back to the local planner/validator.
 
 
 ## Tests
 
-Run the quick checks from the project root:
+Run the test suite from the project root:
 
 - Windows/macOS/Linux:
-  - python -m scripts.smoke_test
-  - python -m scripts.extended_tests
+  - python -m pytest -q
+
+Quick smoke only:
+  - pytest -q tests/test_smoke.py
+
+
+## Reattach Git (VCS)
+
+If your IDE shows “Not under VCS” but this project should track the GitHub repo, use these scripts to (re)attach the working directory to the remote:
+
+- Windows (PowerShell):
+  - .\scripts\git_attach.ps1 -RemoteUrl "https://github.com/GarryWalsh/gym-planner" -Branch main
+
+- macOS/Linux (bash):
+  - chmod +x scripts/git_attach.sh
+  - ./scripts/git_attach.sh "https://github.com/GarryWalsh/gym-planner" main
+
+Verify:
+- git remote -v   # should show origin https://github.com/GarryWalsh/gym-planner
+- git status -sb  # should show branch and status
+
+JetBrains IDE tip:
+- If the project still shows as not under VCS after running the script, re-map the VCS:
+  - Settings/Preferences → Version Control → + Add the project root and set VCS to Git, or
+  - VCS menu → Enable Version Control Integration… → Git.
+- Restarting the IDE can also help it pick up the .git folder.

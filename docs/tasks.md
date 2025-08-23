@@ -36,9 +36,9 @@ The following enumerated checklist outlines actionable improvements for GymPlann
 
 ### LLM & LangGraph Integration
 25. [x] Define strict Pydantic schemas for all graph node inputs/outputs and produce JSON schema for LLM structured outputs.
-26. [ ] Implement a LangGraph graph with nodes (allowed_list → plan_generate → validate → repair) wired with typed boundaries.
+26. [x] Implement a LangGraph graph with nodes (allowed_list → plan_generate → validate → repair) wired with typed boundaries.
 27. [x] Integrate Groq SDK with structured output parsing, retries, and timeouts; surface helpful error messages.
-28. [ ] Add configuration flags to run in "local only" mode (no LLM) vs. "LLM-assisted" mode.
+28. [x] Add configuration flags to run in "local only" mode (no LLM) vs. "LLM-assisted" mode.
 29. [ ] Implement rate limiting and exponential backoff with jitter for LLM calls.
 30. [ ] Cache LLM intermediate results (e.g., allowed list rationales) keyed by inputs to save costs and time.
 
