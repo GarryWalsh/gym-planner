@@ -1,5 +1,13 @@
 from __future__ import annotations
 
+# Ensure the repository root is on sys.path so that absolute imports like `app.*` work
+# when Streamlit runs this file from within the app/ directory on cloud runtimes.
+import sys
+from pathlib import Path
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 import json
 import hashlib
 from typing import Dict, List
