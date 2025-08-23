@@ -37,8 +37,9 @@ Start the server:
   ```
 
 Notes:
-- Download buttons (CSV, Markdown, PDF) appear under the generated plan on the main page (Export page is deprecated and hidden from the sidebar).
+- Download buttons (CSV, Markdown, PDF) appear under the generated plan on the main page. The old Export page has been removed.
 - If GROQ_API_KEY is set, LLM generate/validate/repair are used with structured outputs; otherwise the app falls back to the local planner/validator.
+- Look for the ℹ️ Info popover near the header to learn how LLMs are used in this app, and the 🧠 Summary popover for a clear explanation of your plan.
 
 
 ## Tests

@@ -98,3 +98,8 @@ The following enumerated checklist outlines actionable improvements for GymPlann
 67. [ ] Add i18n support for UI labels and plan outputs.
 68. [ ] Explore lightweight analytics (opt-in) for feature usage to guide priorities.
 69. [ ] Package as a CLI for batch plan generation separate from Streamlit UI.
+
+### Recently Completed (Session)
+70. [x] Remove deprecated Export page so it does not show on Streamlit Cloud.
+71. [x] Add ℹ️ Info popover (LLM involvement) and 🧠 Summary popover (better-formatted explanation).
+72. [x] Tidy plan action buttons to reduce wrapping and improve alignment.

@@ -50,6 +50,25 @@ if "profile" not in st.session_state:
     st.session_state["profile"] = None
 
 st.title("Gym Plan Creator")
+# Info popover explaining how LLM is used
+info_cols = st.columns([8, 1])
+with info_cols[1]:
+    with st.popover("ℹ️ Info"):
+        st.markdown(
+            """
+            This app creates a weekly gym plan from a local ExRx-linked exercise catalog.
+            
+            How it works:
+            - Allowed list: filters the catalog by your equipment and muscle choices.
+            - Generate: builds a balanced plan (push/pull/legs/full-body variety) with no per-day duplicates.
+            - Validate & Repair: if LLM is enabled (GROQ_API_KEY set), the plan is checked and minimally fixed via structured outputs; otherwise a local validator runs.
+            - Explain & Replace: summary and single-exercise swap can use the LLM when available, with a local fallback.
+            
+            Privacy & Safety:
+            - No uploads of personal data; only your selections and exercise metadata are used.
+            - All LLM responses are schema-enforced JSON, then rendered here.
+            """
+        )
 
 with st.sidebar:
     st.header("Profile")
@@ -226,30 +245,33 @@ else:
 
                 st.info(_answer(q))
 
-    # Explanation (LLM if available, else local summary)
-    with st.expander("Explanation", expanded=False):
-        overall: str
-        day_summaries: List[str]
-        if settings.GROQ_API_KEY:
-            try:
-                exr = explain_plan_llm(current_profile, plan)  # type: ignore[arg-type]
-                overall = exr.overall
-                day_summaries = exr.day_summaries
-            except Exception:
+    # Plan summary popover (LLM if available, else local)
+    summary_cols = st.columns([8, 1])
+    with summary_cols[1]:
+        with st.popover("🧠 Summary"):
+            overall: str
+            day_summaries: List[str]
+            if settings.GROQ_API_KEY:
+                try:
+                    exr = explain_plan_llm(current_profile, plan)  # type: ignore[arg-type]
+                    overall = exr.overall
+                    day_summaries = exr.day_summaries
+                except Exception:
+                    day_summaries = []
+                    overall = f"Your plan supports a {current_profile.goal} goal with {len(plan.days)} sessions, balancing major muscle groups and your selections."
+                    for day in plan.days:
+                        musc = sorted({m for ex in day.exercises for m in ex.primary_muscles})
+                        day_summaries.append(f"Day {day.day_index+1}: {', '.join(musc)}")
+            else:
                 day_summaries = []
-                overall = f"This plan targets your goal of {current_profile.goal} with {len(plan.days)} sessions focusing on variety and your emphasized muscles."
+                overall = f"Your plan supports a {current_profile.goal} goal with {len(plan.days)} sessions, balancing major muscle groups and your selections."
                 for day in plan.days:
                     musc = sorted({m for ex in day.exercises for m in ex.primary_muscles})
-                    day_summaries.append(f"Day {day.day_index+1} covers: {', '.join(musc)}")
-        else:
-            day_summaries = []
-            overall = f"This plan targets your goal of {current_profile.goal} with {len(plan.days)} sessions focusing on variety and your emphasized muscles."
-            for day in plan.days:
-                musc = sorted({m for ex in day.exercises for m in ex.primary_muscles})
-                day_summaries.append(f"Day {day.day_index+1} covers: {', '.join(musc)}")
-        st.write(overall)
-        for s in day_summaries:
-            st.write("- " + s)
+                    day_summaries.append(f"Day {day.day_index+1}: {', '.join(musc)}")
+            st.markdown(f"**Overview:** {overall}")
+            st.markdown("**By day:**")
+            for s in day_summaries:
+                st.markdown(f"- {s}")
 
     # Per-day display
     muscle_emojis: Dict[str, str] = {}
