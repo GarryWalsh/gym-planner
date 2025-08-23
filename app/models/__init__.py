@@ -14,6 +14,8 @@ from .llm_io import (
     ReplacementResponse,
     ExplainRequest,
     ExplainResponse,
+    PlanQARequest,
+    PlanQAResponse,
 )
 
 __all__ = [
@@ -37,4 +39,6 @@ __all__ = [
     "ReplacementResponse",
     "ExplainRequest",
     "ExplainResponse",
+    "PlanQARequest",
+    "PlanQAResponse",
 ]

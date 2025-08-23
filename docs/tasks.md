@@ -30,7 +30,7 @@ The following enumerated checklist outlines actionable improvements for GymPlann
 19. [x] Implement allowed_list builder to filter catalog based on constraints (equipment availability, injuries, preferences).
 20. [x] Implement plan_generate to assemble multi-day programs balancing movement patterns (push/pull/legs/full-body) and volume.
 21. [x] Implement validate step to check plan constraints (volume caps, muscle group frequency, exercise diversity) with clear errors.
-22. [ ] Implement repair step to iteratively fix validation failures (swap exercises, adjust volume) with deterministic fallback.
+22. [x] Implement repair step to iteratively fix validation failures (swap exercises, adjust volume) with deterministic fallback.
 23. [ ] Add reproducibility controls (random seed) for deterministic plan generation when LLM is not used.
 24. [x] Provide CSV and Markdown exporters for any generated plan (app/exporters/csv.py and app/exporters/markdown.py).
 
@@ -103,3 +103,22 @@ The following enumerated checklist outlines actionable improvements for GymPlann
 70. [x] Remove deprecated Export page so it does not show on Streamlit Cloud.
 71. [x] Add ℹ️ Info popover (LLM involvement) and 🧠 Summary popover (better-formatted explanation).
 72. [x] Tidy plan action buttons to reduce wrapping and improve alignment.
+
+
+### LLM Deep Dive Opportunities
+- CritiquePlan job: Given PROFILE+PLAN, return structured suggestions to improve balance, variety, and alignment to goal (JSON: {actions[], notes}).
+- WarmupCooldown job: Generate a brief warm-up and cooldown for each day (schema with simple bullet strings) respecting equipment filters.
+- VolumeBalancer job: Compute sets/week per muscle and propose minimal changes to hit target bands (e.g., 8–20 sets major groups) without exceeding max_exercises_per_day.
+- TimeEstimator+Trimmer job: Estimate per-day time from sets/reps/rest and trim/adjust if session_minutes_cap would be exceeded; surface reasoning.
+- RationaleAnnotator job: Add one-line rationales per exercise to support UI tooltips; avoid health claims.
+- SubstituteJustifier job: On replacement, also return a brief reason for the swap.
+- RiskCheck job: Flag potentially risky sequencing or overload (e.g., heavy hinge day before another hinge) and propose small fixes.
+- Caching & Rate limiting: Implement memoization of LLM calls keyed by PROFILE+ALLOWED+PLAN; add jittered exponential backoff and client-side throttling.
+- Streaming UX (optional): For long jobs, stream intermediate tokens with a loading state.
+
+### Recently Completed (Session, addendum)
+73. [x] Collapse Q&A label and keep placeholder; Ask button inline; Enter-to-submit via form.
+74. [x] Group plan actions (Regenerate/Clear) left and exports (CSV/MD/PDF) right as a balanced toolbar.
+75. [x] Integrate LLM Plan Q&A with strict JSON outputs and local fallback.
+76. [x] Ensure per-day duplicate exercises are removed and days are topped up to the configured max where possible.
+77. [x] PDF export: add pure-Python fallback so downloads work without reportlab.

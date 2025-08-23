@@ -78,3 +78,13 @@ class ExplainRequest(BaseModel):
 class ExplainResponse(BaseModel):
     overall: str
     day_summaries: List[str]
+
+
+class PlanQARequest(BaseModel):
+    profile: UserProfile
+    plan: Plan
+    question: str
+
+
+class PlanQAResponse(BaseModel):
+    answer: str

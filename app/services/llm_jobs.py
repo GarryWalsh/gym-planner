@@ -11,6 +11,7 @@ from app.models import (
     ReplacementRequest,
     ReplacementResponse,
     UserProfile,
+    PlanQAResponse,
 )
 from app.models.plan import Plan
 from app.services.catalog import load_catalog
@@ -81,3 +82,19 @@ def replace_exercise_llm(
     )
     rr = ReplacementResponse.model_validate(resp)
     return rr.plan
+
+
+def answer_plan_question_llm(profile: UserProfile, plan: Plan, question: str) -> PlanQAResponse:
+    system = _load_prompt("qa_plan.md")
+    payload = {
+        "PROFILE": profile.model_dump(mode="json"),
+        "PLAN": plan.model_dump(mode="json"),
+        "QUESTION": question,
+    }
+    resp = chat_json(
+        schema=PlanQAResponse.model_json_schema(),
+        system=system,
+        user=json.dumps(payload, ensure_ascii=False),
+        temperature=0.2,
+    )
+    return PlanQAResponse.model_validate(resp)

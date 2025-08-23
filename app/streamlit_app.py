@@ -22,7 +22,7 @@ from app.services.catalog import load_catalog
 from app.services.export import to_csv, to_markdown, to_pdf
 from app.services.planner_local import replace_one_exercise
 from app.config import get_settings
-from app.services.llm_jobs import explain_plan_llm, replace_exercise_llm
+from app.services.llm_jobs import explain_plan_llm, replace_exercise_llm, answer_plan_question_llm
 
 st.set_page_config(page_title="Gym Planner", page_icon="🏋️", layout="wide")
 settings = get_settings()
@@ -154,53 +154,68 @@ else:
     except Exception as _e:  # pragma: no cover
         pdf_error = str(_e)
 
-    left1, left2, spacer, right1, right2, right3 = st.columns([1, 1, 6, 1, 1, 1])
-    with left1:
-        if st.button("🔁 Regenerate plan", key="btn-regenerate", use_container_width=True):
-            ids = shortlist(profile)
-            if not ids:
-                st.error("No exercises available with the current constraints. Adjust filters and try again.")
-            else:
-                import time as _time
-                graph = PlanGraph()
-                seed = int(_time.time() * 1000) & 0x7FFFFFFF
-                state = graph.invoke(profile, seed=seed)
-                st.session_state["plan"] = state["plan_res"].plan  # type: ignore[index]
-                st.session_state["profile"] = profile
-                st.toast("Plan regenerated.")
-                st.rerun()
-    with left2:
-        if st.button("🧹 Clear plan", key="btn-clear", use_container_width=True):
-            st.session_state["plan"] = None
-            st.session_state["profile"] = None
-            st.toast("Cleared.")
-            st.rerun()
-    with right1:
-        st.download_button("📄 CSV", data=csv_bytes, file_name="gym_plan.csv", mime="text/csv")
-    with right2:
-        st.download_button("📝 Markdown", data=md_text, file_name="gym_plan.md", mime="text/markdown")
-    with right3:
-        if pdf_bytes:
-            st.download_button("📘 PDF", data=pdf_bytes, file_name="gym_plan.pdf", mime="application/pdf")
-        elif pdf_error:
-            st.caption("PDF unavailable: " + pdf_error)
+    # Toolbar: left actions (Regenerate, Clear), right exports (CSV/MD/PDF)
+    with st.container():
+        left_zone, right_zone = st.columns([7, 5])
+        with left_zone:
+            a1, a2 = st.columns([2, 1])
+            with a1:
+                if st.button("🔁 Regenerate plan", key="btn-regenerate", use_container_width=True, type="primary"):
+                    ids = shortlist(profile)
+                    if not ids:
+                        st.error("No exercises available with the current constraints. Adjust filters and try again.")
+                    else:
+                        import time as _time
+                        graph = PlanGraph()
+                        seed = int(_time.time() * 1000) & 0x7FFFFFFF
+                        state = graph.invoke(profile, seed=seed)
+                        st.session_state["plan"] = state["plan_res"].plan  # type: ignore[index]
+                        st.session_state["profile"] = profile
+                        st.toast("Plan regenerated.")
+                        st.rerun()
+            with a2:
+                if st.button("🧹 Clear plan", key="btn-clear", use_container_width=True):
+                    st.session_state["plan"] = None
+                    st.session_state["profile"] = None
+                    st.toast("Cleared.")
+                    st.rerun()
+        with right_zone:
+            d1, d2, d3 = st.columns(3)
+            with d1:
+                st.download_button("📄 CSV", data=csv_bytes, file_name="gym_plan.csv", mime="text/csv", use_container_width=True)
+            with d2:
+                st.download_button("📝 Markdown", data=md_text, file_name="gym_plan.md", mime="text/markdown", use_container_width=True)
+            with d3:
+                if pdf_bytes:
+                    st.download_button("📘 PDF", data=pdf_bytes, file_name="gym_plan.pdf", mime="application/pdf", use_container_width=True)
+                elif pdf_error:
+                    st.caption("PDF unavailable: " + pdf_error)
 
     # Fitness Q&A (strictly validated)
     st.markdown("\n")
     with st.container():
         st.subheader("Ask about your plan")
-        q = st.text_input("Question (fitness topics only)", value="", placeholder="e.g., Which days train chest? How many sets are in this plan?", key="qa-input")
-        ask = st.button("❓ Ask", key="qa-ask")
-        if ask:
+        # Inline form so Enter submits, with Ask button on the same line
+        with st.form("qa-form", clear_on_submit=False):
+            row = st.columns([8, 1])
+            with row[0]:
+                q = st.text_input(
+                    "",
+                    value="",
+                    placeholder="e.g., Which days train chest? How many sets are in this plan?",
+                    key="qa-input",
+                    label_visibility="collapsed",
+                )
+            with row[1]:
+                submitted = st.form_submit_button("❓ Ask", use_container_width=True)
+        if submitted:
             def _is_valid_question(text: str) -> tuple[bool, str | None]:
                 t = (text or "").strip()
                 if len(t) < 5 or len(t) > 300:
                     return False, "Please enter a concise question (5–300 chars)."
                 lower = t.lower()
-                # No URLs/emails
                 if "http://" in lower or "https://" in lower or "www." in lower or "@" in lower:
                     return False, "Links, emails, or external references are not allowed."
-                # Require fitness-related keywords or muscles
                 fitness_kw = {
                     "exercise","exercises","set","sets","rep","reps","rest","muscle","muscles",
                     "volume","frequency","intensity","superset","warmup","cooldown","day","plan",
@@ -213,37 +228,42 @@ else:
             if not ok:
                 st.error(err)
             else:
-                # Build a safe local answer based on the current plan
-                def _answer(text: str) -> str:
-                    lower = text.lower()
-                    lines = []
-                    # Summaries per day
-                    if any(x in lower for x in ["day","which","when"]):
-                        for day in plan.days:
-                            musc = sorted({m for ex in day.exercises for m in ex.primary_muscles})
-                            lines.append(f"Day {day.day_index+1} ({day.label}) covers: {', '.join(musc)}")
-                    # Muscles mentioned
-                    muscles = sorted({m.lower() for d in plan.days for ex in d.exercises for m in ex.primary_muscles}) if plan.days else []
-                    target_muscles = [m for m in muscles if m in lower]
-                    if target_muscles:
-                        for tm in target_muscles:
-                            hits = []
+                answer_text: str | None = None
+                if settings.GROQ_API_KEY:
+                    try:
+                        qa = answer_plan_question_llm(current_profile, plan, q)  # type: ignore[arg-type]
+                        answer_text = (qa.answer or "").strip()
+                    except Exception:
+                        answer_text = None
+                if not answer_text:
+                    # Local fallback based on the current plan
+                    def _answer(text: str) -> str:
+                        lower = text.lower()
+                        lines = []
+                        if any(x in lower for x in ["day","which","when"]):
                             for day in plan.days:
-                                exes = [ex.name for ex in day.exercises if tm in [mm.lower() for mm in ex.primary_muscles]]
-                                if exes:
-                                    hits.append(f"Day {day.day_index+1}: " + ", ".join(exes))
-                            if hits:
-                                lines.append(f"Muscle '{tm}' appears in → " + " | ".join(hits))
-                    # Sets/reps/rest
-                    if any(x in lower for x in ["set","sets","rep","reps","rest"]):
-                        if plan.days:
-                            d0 = plan.days[0]
-                            lines.append(f"Default prescription: {d0.sets} sets × {d0.reps} reps; rest {d0.rest_seconds}s.")
-                    if not lines:
-                        lines.append("This plan is designed around your selections. Try asking about muscles (e.g., chest), days, or sets/reps/rest.")
-                    return "\n".join(lines)
-
-                st.info(_answer(q))
+                                musc = sorted({m for ex in day.exercises for m in ex.primary_muscles})
+                                lines.append(f"Day {day.day_index+1} ({day.label}) covers: {', '.join(musc)}")
+                        muscles = sorted({m.lower() for d in plan.days for ex in d.exercises for m in ex.primary_muscles}) if plan.days else []
+                        target_muscles = [m for m in muscles if m in lower]
+                        if target_muscles:
+                            for tm in target_muscles:
+                                hits = []
+                                for day in plan.days:
+                                    exes = [ex.name for ex in day.exercises if tm in [mm.lower() for mm in ex.primary_muscles]]
+                                    if exes:
+                                        hits.append(f"Day {day.day_index+1}: " + ", ".join(exes))
+                                if hits:
+                                    lines.append(f"Muscle '{tm}' appears in → " + " | ".join(hits))
+                        if any(x in lower for x in ["set","sets","rep","reps","rest"]):
+                            if plan.days:
+                                d0 = plan.days[0]
+                                lines.append(f"Default prescription: {d0.sets} sets × {d0.reps} reps; rest {d0.rest_seconds}s.")
+                        if not lines:
+                            lines.append("This plan is designed around your selections. Try asking about muscles (e.g., chest), days, or sets/reps/rest.")
+                        return "\n".join(lines)
+                    answer_text = _answer(q)
+                st.info(answer_text)
 
     # Plan summary popover (LLM if available, else local)
     summary_cols = st.columns([8, 1])
