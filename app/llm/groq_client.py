@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import time
+import copy
 from typing import Any, Dict, Optional
 
 from app.config import get_settings
@@ -14,6 +15,48 @@ except Exception:  # pragma: no cover
 
 class LLMError(RuntimeError):
     pass
+
+# Telemetry placeholders for UI annotations
+LAST_USED_MODEL: Optional[str] = None
+LAST_OVERRIDE_NOTE: Optional[str] = None
+
+
+def _harden_schema_for_groq(schema: Dict[str, Any]) -> Dict[str, Any]:
+    """Recursively set additionalProperties=false on all object schemas.
+    This helps satisfy providers that require closed objects for JSON Schema outputs.
+    """
+    def visit(node: Any) -> Any:
+        if isinstance(node, dict):
+            # combination keywords
+            for k in ("allOf", "anyOf", "oneOf"):
+                if k in node and isinstance(node[k], list):
+                    node[k] = [visit(x) for x in node[k]]
+            # properties
+            props = node.get("properties")
+            if isinstance(props, dict):
+                for pk, pv in list(props.items()):
+                    props[pk] = visit(pv)
+            # items (array)
+            if "items" in node:
+                it = node["items"]
+                if isinstance(it, list):
+                    node["items"] = [visit(x) for x in it]
+                else:
+                    node["items"] = visit(it)
+            # definitions
+            for defs_key in ("$defs", "definitions"):
+                if defs_key in node and isinstance(node[defs_key], dict):
+                    for dk, dv in list(node[defs_key].items()):
+                        node[defs_key][dk] = visit(dv)
+            # enforce closed objects
+            node_type = node.get("type")
+            if node_type == "object" or isinstance(props, dict) or "properties" in node:
+                node["additionalProperties"] = False
+        elif isinstance(node, list):
+            return [visit(x) for x in node]
+        return node
+
+    return visit(copy.deepcopy(schema))
 
 
 def chat_json(*, schema: Dict[str, Any], system: str, user: str, temperature: float | None = None) -> Dict[str, Any]:
@@ -38,7 +81,7 @@ def chat_json(*, schema: Dict[str, Any], system: str, user: str, temperature: fl
         "type": "json_schema",
         "json_schema": {
             "name": "strict_schema",
-            "schema": schema,
+            "schema": _harden_schema_for_groq(schema),
             "strict": True,
         },
     }
