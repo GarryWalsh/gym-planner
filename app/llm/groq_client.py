@@ -17,14 +17,22 @@ class LLMError(RuntimeError):
 
 
 def chat_json(*, schema: Dict[str, Any], system: str, user: str, temperature: float | None = None) -> Dict[str, Any]:
+    """Strict Groq client — uses exactly the model specified in GROQ_MODEL (or DEFAULT if unset).
+    No aliasing, no multi-candidate fallbacks, no guessing.
+    """
+    global LAST_USED_MODEL, LAST_OVERRIDE_NOTE
+
     settings = get_settings()
     if not settings.GROQ_API_KEY:
         raise LLMError("GROQ_API_KEY is not set; cannot perform LLM call.")
+    if not settings.GROQ_MODEL:
+        raise LLMError("GROQ_MODEL is not set; cannot perform LLM call.")
     if Groq is None:
         raise LLMError("groq SDK not available.")
 
     client = Groq(api_key=settings.GROQ_API_KEY)
     temp = settings.GROQ_TEMPERATURE if temperature is None else temperature
+    requested_model = settings.GROQ_MODEL.strip()
 
     response_format = {
         "type": "json_schema",
@@ -40,11 +48,12 @@ def chat_json(*, schema: Dict[str, Any], system: str, user: str, temperature: fl
         {"role": "user", "content": user},
     ]
 
-    # simple retry for transient errors
+    # Simple retry for transient errors (e.g., intermittent 5xx)
+    last_error: Optional[str] = None
     for attempt in range(2):
         try:
             resp = client.chat.completions.create(
-                model=settings.GROQ_MODEL,
+                model=requested_model,
                 messages=messages,
                 temperature=temp,
                 response_format=response_format,
@@ -54,7 +63,10 @@ def chat_json(*, schema: Dict[str, Any], system: str, user: str, temperature: fl
                 raise LLMError("Empty response content from LLM.")
             return json.loads(content)
         except Exception as e:  # noqa: PERF203
+            last_error = str(e)
             if attempt == 0:
                 time.sleep(0.5)
                 continue
-            raise LLMError(f"LLM call failed: {e}")
+            # Give the exact underlying reason back to the caller (nodes/UI will display it)
+            raise LLMError(f"LLM call failed (model='{requested_model}'): {last_error}")
+    return {}

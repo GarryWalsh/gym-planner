@@ -73,3 +73,11 @@ JetBrains IDE tip:
   - Settings/Preferences → Version Control → + Add the project root and set VCS to Git, or
   - VCS menu → Enable Version Control Integration… → Git.
 - Restarting the IDE can also help it pick up the .git folder.
+
+
+## Groq model compatibility
+
+- The app uses exactly the model specified in GROQ_MODEL. There is no automatic aliasing or multi-model fallback.
+- If GROQ_MODEL is unset, the default used is: llama-3.1-70b-specdec.
+- Ensure your chosen model supports Groq JSON Schema structured outputs. Recommended: llama-3.1-70b-specdec or llama-3.1-8b-instant.
+- If the specified model is invalid, decommissioned, or unsupported for JSON Schema, the UI will show the exact error returned by Groq. Update GROQ_MODEL accordingly (see https://console.groq.com/docs/models).

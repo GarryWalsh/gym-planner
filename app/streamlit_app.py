@@ -121,11 +121,24 @@ div[data-testid="stVerticalBlockBorderWrapper"]
 }
 
 /* Compact, uniform buttons */
-.stButton > button, .stDownloadButton > button{
-  display:inline-flex !important; align-items:center !important; justify-content:center !important;
-  height:30px !important; min-height:30px !important;
-  padding:0 .56rem !important; line-height:1.1 !important; white-space:nowrap !important;
+/* Make ALL action buttons the same size */
+.stButton > button,
+.stDownloadButton > button,
+button[data-testid="baseButton-primary"],
+button[data-testid="baseButton-secondary"],
+/* Popover trigger buttons (st.popover) */
+div[data-testid="stPopover"] > div > button,
+button[aria-haspopup="dialog"] {
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  height:30px !important;
+  min-height:30px !important;
+  padding:0 .56rem !important;
+  line-height:1.1 !important;
+  white-space:nowrap !important;
 }
+
 
 /* ── Sidebar spacing (comfortable but not cramped) ─────────────────────────── */
 [data-testid="stSidebar"] .stVerticalBlock{ gap:.55rem !important; }
@@ -174,19 +187,14 @@ if "plan" not in st.session_state:
 if "profile" not in st.session_state:
     st.session_state["profile"] = None
 
-header_cols = st.columns([9, 1])
-with header_cols[0]:
-    st.title("Gym Plan Creator")
-with header_cols[1]:
-    # Moved Info button next to the Q&A header for better alignment
-    pass
+st.title("AI Gym Plan Creator")
 
 with st.sidebar:
     st.header("Profile")
     goal = st.selectbox("Goal", ["hypertrophy", "strength", "hybrid"], index=0, format_func=lambda s: s.title())
     days_per_week = st.slider("Days per week", min_value=1, max_value=6, value=3)
-    session_minutes_cap = st.slider("Session length cap (min)", 30, 120, 60, step=5)
-    max_exercises_per_day = st.slider("Max exercises per day", 3, 10, 5)
+    max_exercises_per_workout = st.slider("Max exercises per workout", 3, 10, 5)
+    session_minutes_cap = st.slider("Session length (min)", 30, 120, 60, step=5)
     # Prescription removed from UI; using internal defaults
     default_sets = 3
     default_reps = 10
@@ -247,7 +255,7 @@ with st.sidebar:
         goal=goal,
         days_per_week=days_per_week,
         session_minutes_cap=session_minutes_cap,
-        max_exercises_per_day=max_exercises_per_day,
+        max_exercises_per_day=max_exercises_per_workout,
         default_sets=default_sets,
         default_reps=default_reps,
         rest_seconds=rest_seconds,
@@ -290,6 +298,24 @@ else:
             _src = "llm" if settings.GROQ_API_KEY else "local"
         badge = "🧩 Mode: LLM" if _src == "llm" else "🧰 Mode: Local"
         st.markdown(f"<div style='text-align:right'>{badge}</div>", unsafe_allow_html=True)
+    # If LLM key present but plan fell back to local, show a small warning once per render
+    try:
+        if settings.GROQ_API_KEY and _src != "llm":
+            meta = (getattr(plan, "meta", {}) or {})  # type: ignore[attr-defined]
+            _err = meta.get("llm_error")
+            if _err:
+                st.warning(f"LLM fallback in generation: {_err}")
+                with st.expander("Why LLM failed (details)"):
+                    model_used = meta.get("llm_model") or "unknown"
+                    note = meta.get("llm_note")
+                    raw = meta.get("llm_error_detail") or _err
+                    st.markdown(f"- Model tried: `{model_used}`")
+                    if note:
+                        st.markdown(f"- Note: {note}")
+                    st.markdown("Full error:")
+                    st.code(str(raw))
+    except Exception:
+        pass
 
     # Single-row actions: plan options left, export right
     csv_bytes = to_csv(plan)
@@ -342,7 +368,7 @@ else:
     # Fitness Q&A (strictly validated)
     st.markdown("\n")
     with st.container():
-        pop_cols = st.columns([1, 1])
+        pop_cols = st.columns([2, 2, 13])
         with pop_cols[0]:
             with st.popover("ℹ️ How it works"):
                 st.markdown(

@@ -113,6 +113,7 @@ def _top_up_days(plan: PlanResponse, req: PlanRequest) -> PlanResponse:
 
 
 def plan_generate_node(req: PlanRequest) -> PlanResponse:
+    llm_err: str | None = None
     # Try LLM first if enabled
     if _llm_enabled():
         try:
@@ -137,13 +138,41 @@ def plan_generate_node(req: PlanRequest) -> PlanResponse:
             except Exception:
                 pass
             return pr
-        except Exception:
-            # fall back to local
-            pass
+        except Exception as e:
+            # Capture reason and fall back to local
+            try:
+                llm_err = str(e)
+            except Exception:
+                llm_err = "unknown error"
     plan = generate_local_plan(req.profile, req.allowed_exercise_ids)
     pr_local = PlanResponse(plan=plan)
     pr_local = _dedupe_plan_per_day(pr_local)
     pr_local = _top_up_days(pr_local, req)
+    try:
+        pr_local.plan.meta = dict(pr_local.plan.meta or {})
+        pr_local.plan.meta.setdefault("source", "local")
+        # If LLM was enabled but failed, surface full details (no truncation)
+        if _llm_enabled():
+            # prefer captured error detail
+            detail_raw = (llm_err or pr_local.plan.meta.get("llm_error") or "").strip()
+            if detail_raw:
+                # normalize whitespace but do NOT truncate; also store a raw/detail copy
+                detail_clean = " ".join(detail_raw.split())
+                pr_local.plan.meta["llm_error"] = f"generation failed: {detail_clean}"
+                pr_local.plan.meta["llm_error_detail"] = detail_raw
+            else:
+                pr_local.plan.meta["llm_error"] = pr_local.plan.meta.get("llm_error") or "LLM fallback: generation failed"
+            # If groq_client recorded model info or notes during attempts, surface them
+            try:
+                from app.llm.groq_client import LAST_USED_MODEL, LAST_OVERRIDE_NOTE  # lazy import to avoid cycle
+                if LAST_USED_MODEL:
+                    pr_local.plan.meta["llm_model"] = LAST_USED_MODEL
+                if LAST_OVERRIDE_NOTE:
+                    pr_local.plan.meta["llm_note"] = LAST_OVERRIDE_NOTE
+            except Exception:
+                pass
+    except Exception:
+        pass
     return pr_local
 
 

@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
 
     GROQ_API_KEY: Optional[str] = None
-    GROQ_MODEL: str = "llama-3.1-70b-versatile"
+    GROQ_MODEL: Optional[str] = None
     GROQ_TEMPERATURE: float = 0.2
 
     # App-level policies
@@ -41,6 +41,13 @@ def get_settings() -> Settings:
         if env_key:
             try:
                 s.GROQ_API_KEY = env_key  # type: ignore[assignment]
+            except Exception:
+                pass
+    if not s.GROQ_MODEL:
+        env_model = os.environ.get("GROQ_MODEL")
+        if env_model:
+            try:
+                s.GROQ_MODEL = env_model  # type: ignore[assignment]
             except Exception:
                 pass
     return s
