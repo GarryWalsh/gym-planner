@@ -167,7 +167,7 @@ with st.sidebar:
                           blacklisted_equipment=[],  # single selector UX; blacklist derived from deselection if needed
                           emphasis=emphasis_map, blacklisted_muscles=blacklisted_muscles, blacklisted_exercise_ids=[], )
 
-    if st.button("Generate plan", use_container_width=True):
+    if st.button("Generate plan", width="stretch"):
         ids = shortlist(profile)
         if not ids:
             st.error("No exercises available with the current constraints. Adjust filters and try again.")
@@ -205,7 +205,7 @@ else:
         with left_zone:
             a1, a2 = st.columns([2, 1])
             with a1:
-                if st.button("🔁 Regenerate plan", key="btn-regenerate", use_container_width=True, type="secondary"):
+                if st.button("🔁 Regenerate plan", key="btn-regenerate", width="stretch", type="secondary"):
                     ids = shortlist(profile)
                     if not ids:
                         st.error("No exercises available with the current constraints. Adjust filters and try again.")
@@ -220,7 +220,7 @@ else:
                         st.toast("Plan regenerated.")
                         st.rerun()
             with a2:
-                if st.button("🧹 Clear plan", key="btn-clear", use_container_width=True):
+                if st.button("🧹 Clear plan", key="btn-clear", width="stretch"):
                     st.session_state["plan"] = None
                     st.session_state["profile"] = None
                     st.toast("Cleared.")
@@ -228,12 +228,12 @@ else:
         with right_zone:
             d1, d2, d3 = st.columns(3)
             with d1:
-                st.download_button("📄 CSV", data=csv_bytes, file_name="gym_plan.csv", mime="text/csv", use_container_width=True)
+                st.download_button("📄 CSV", data=csv_bytes, file_name="gym_plan.csv", mime="text/csv", width="stretch")
             with d2:
-                st.download_button("📝 Markdown", data=md_text, file_name="gym_plan.md", mime="text/markdown", use_container_width=True)
+                st.download_button("📝 Markdown", data=md_text, file_name="gym_plan.md", mime="text/markdown", width="stretch")
             with d3:
                 if pdf_bytes:
-                    st.download_button("📘 PDF", data=pdf_bytes, file_name="gym_plan.pdf", mime="application/pdf", use_container_width=True)
+                    st.download_button("📘 PDF", data=pdf_bytes, file_name="gym_plan.pdf", mime="application/pdf", width="stretch")
                 elif pdf_error:
                     st.caption("PDF unavailable: " + pdf_error)
 
@@ -324,7 +324,7 @@ else:
                                   placeholder="e.g. Which days train chest? Where are legs trained?",
                                   key="qa-input", label_visibility="collapsed", )
             with row[1]:
-                submitted = st.form_submit_button("❓ Ask", use_container_width=True)
+                submitted = st.form_submit_button("❓ Ask", width="stretch")
         if submitted:
             def _is_valid_question(text: str) -> tuple[bool, str | None]:
                 t = (text or "").strip()
@@ -386,13 +386,12 @@ else:
                     answer_text = _answer(q)
                 st.info(answer_text)
 
-    # Per-day display
-    muscle_emojis: Dict[str, str] = {}
     for day in plan.days:
         with st.expander(f"Day {day.day_index + 1}: {day.label}"):
             for idx, ex in enumerate(day.exercises):
-                cols = st.columns([10, 2])
-                with cols[0]:
+                left, right = st.columns([10, 3], vertical_alignment="center")
+
+                with left:
                     html = "<div class='ex-card'>"
                     html += f"<a class='exlink' href='{ex.exrx_url}' target='_blank'>{ex.name}</a>"
                     chips_m = "".join(f"<span class='chip'>{pretty_text(m)}</span>" for m in ex.primary_muscles)
@@ -401,33 +400,37 @@ else:
                     html += f"<div class='chips'>{chips_m}{chip_fn}{chips_eq}</div>"
                     html += "</div>"
                     st.markdown(html, unsafe_allow_html=True)
-                with cols[1]:
-                    if st.button("🔀 Swap", key=f"chg-{day.day_index}-{idx}-{ex.id}", use_container_width=True):
+
+                with right:
+                    c1, c2 = st.columns(2, vertical_alignment="center")
+                    swap_clicked = c1.button("Swap", icon="🔀", key=f"chg-{day.day_index}-{idx}-{ex.id}",
+                                             use_container_width=True)
+                    remove_clicked = c2.button("Remove", icon="🗑️", key=f"rm-{day.day_index}-{idx}-{ex.id}",
+                                               use_container_width=True)
+
+                    if swap_clicked:
                         allowed_ids = shortlist(current_profile)
                         if settings.GROQ_API_KEY:
                             try:
                                 st.session_state["plan"] = replace_exercise_llm(current_profile,
-                                                                                st.session_state["plan"], day.day_index,
-                                                                                ex.id, allowed_ids)
+                                    st.session_state["plan"], day.day_index, ex.id, allowed_ids)
                             except Exception:
                                 st.session_state["plan"] = replace_one_exercise(current_profile,
-                                                                                st.session_state["plan"], day.day_index,
-                                                                                ex.id, allowed_ids)
+                                    st.session_state["plan"], day.day_index, ex.id, allowed_ids)
                         else:
                             st.session_state["plan"] = replace_one_exercise(current_profile, st.session_state["plan"],
-                                                                            day.day_index, ex.id, allowed_ids)
+                                day.day_index, ex.id, allowed_ids)
+                        st.toast("Exercise swapped.")
                         st.rerun()
-                    if st.button("🗑️ Remove", key=f"rm-{day.day_index}-{idx}-{ex.id}", use_container_width=True):
-                        # Remove this exercise from the day and recompute weekly focus
+
+                    if remove_clicked:
                         _plan = st.session_state.get("plan")
                         if _plan is not None:
                             _day = _plan.days[day.day_index]
-                            # remove by id (first match)
                             for _j, _e in enumerate(_day.exercises):
                                 if _e.id == ex.id:
                                     del _day.exercises[_j]
                                     break
-                            # recompute weekly_focus
                             _counts: Dict[str, int] = {}
                             for _d in _plan.days:
                                 for _ex in _d.exercises:
