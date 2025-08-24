@@ -44,51 +44,6 @@ div[data-testid="stVerticalBlockBorderWrapper"]{
   padding: .20rem .85rem !important;
 }
 
-/* Turn the *inner* card content into a 2x2 grid */
-div[data-testid="stVerticalBlockBorderWrapper"] > div[data-testid="stVerticalBlock"]{
-  display: grid !important;
-  grid-template-columns: 1fr auto;             /* content | actions */
-  grid-template-areas:
-    "title   actions"
-    "chips   actions";
-  row-gap: .10rem;                              /* tighter, reduces push down */
-  column-gap: .75rem;
-  align-items: center;                          /* centers actions across rows */
-}
-
-/* Collapse the first horizontal row so its two columns can be grid items */
-div[data-testid="stVerticalBlockBorderWrapper"]
-  > div[data-testid="stVerticalBlock"]
-  > div[data-testid="stHorizontalBlock"]:first-child{
-  display: contents !important;
-}
-
-/* Map the two columns into the grid */
-div[data-testid="stVerticalBlockBorderWrapper"]
-  > div[data-testid="stVerticalBlock"]
-  > div[data-testid="stHorizontalBlock"]:first-child
-  > div[data-testid="column"]:first-child{          /* title col */
-    grid-area: title;
-}
-div[data-testid="stVerticalBlockBorderWrapper"]
-  > div[data-testid="stVerticalBlock"]
-  > div[data-testid="stHorizontalBlock"]:first-child
-  > div[data-testid="column"]:last-child{           /* actions col */
-    grid-area: actions;
-    justify-self: end;                              /* flush right */
-    padding-right: 0 !important;                    /* remove inner padding */
-    margin-right: -0.6rem;                          /* stronger offset to align tighter to right edge */
-    width: max-content;                             /* shrink-to-fit */
-}
-
-/* Map the chips markdown into the grid *reliably* */
-div[data-testid="stVerticalBlockBorderWrapper"]
-  > div[data-testid="stVerticalBlock"]
-  > .stMarkdown:has(.chips){
-    grid-area: chips;
-    margin: 0 !important;                           /* kill stray margins */
-}
-
 /* Title styling */
 .ex-title{
   margin: 0 !important;
@@ -108,18 +63,6 @@ a.exlink:hover{ text-decoration: underline; }
 .chip{ padding:2px 8px; border-radius:999px; font-size:12px; background:#eef2f7; color:#334155; }
 .chip.fn{ background:#e7f5ff; color:#1e3a8a; }
 .chip.eq{ background:#f1f5f9; }
-
-/* Actions: side-by-side, tight, and right aligned */
-div[data-testid="stVerticalBlockBorderWrapper"]
-  > div[data-testid="stVerticalBlock"]
-  > div[data-testid="stHorizontalBlock"]:first-child
-  > div[data-testid="column"]:last-child > div{
-    display: flex !important;
-    flex-direction: row !important;                 /* side-by-side */
-    align-items: center !important;                 /* vertically centered */
-    justify-content: flex-end !important;           /* right edge */
-    gap: .25rem !important;                         /* tight spacing */
-}
 
 /* Compact, uniform buttons */
 /* Make ALL action buttons the same size */
@@ -145,6 +88,89 @@ button[aria-haspopup="dialog"] {
 [data-testid="stSidebar"] .stVerticalBlock{ gap:.55rem !important; }
 [data-testid="stSidebar"] .stCheckbox{ margin-bottom:.34rem !important; }
 .stCheckbox label{ white-space: nowrap; }
+
+/* === Buttons: unified size (append this at the very bottom) === */
+.stButton > button{
+  height:30px !important;
+  min-height:30px !important;
+  min-width:36px !important;
+  padding:0 .45rem !important;
+}
+
+/* Make the two grid rows (title | chips) size comfortably */
+div[data-testid="stVerticalBlockBorderWrapper"] > div[data-testid="stVerticalBlock"]{
+  grid-template-rows: minmax(30px, auto) auto;  /* first row ≥ 30px, chips row auto */
+  row-gap: .25rem;                              /* a touch more breathing room */
+}
+
+/* Nudge the chips down slightly (optional but helps) */
+.chips{ margin-top: .20rem; }
+
+/* Extra breathing room only for exercise cards that have chips */
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.chips){
+  /* top | sides | bottom  → tweak the last value to taste */
+  padding: .6rem .85rem 1.05rem !important;
+}
+
+/* Small margin below the chip row */
+.chips{ margin-bottom: .35rem !important; }
+
+
+/* If 7+ chips present, add a bit more bottom padding */
+div[data-testid="stVerticalBlockBorderWrapper"]:has(.chips .chip:nth-child(n+7)){
+  padding-bottom: 1.25rem !important;
+}
+
+
+/* Chip row can wrap, with small top/bottom spacing */
+.chips{
+  display: flex; flex-wrap: wrap;
+  gap: .24rem .38rem;
+  margin: .15rem 0 .25rem 0;
+}
+
+/* Keep all small buttons a consistent height */
+.stButton > button,
+.stDownloadButton > button,
+button[data-testid="baseButton-primary"],
+button[data-testid="baseButton-secondary"]{
+  height:30px !important; min-height:30px !important;
+  min-width:36px !important; padding:0 .45rem !important;
+}
+
+/* Expander shell (rounded card) */
+div[data-testid="stExpander"] > details{
+  border: 1px solid #c7d2fe;          /* border color */
+  border-radius: 10px;
+  background: #f8fafc;                /* card background */
+}
+
+/* Expander header (collapsed) */
+div[data-testid="stExpander"] > details > summary{
+  background: #eef2ff;                /* header background */
+  color: #1e293b;                     /* header text */
+  padding: .65rem .9rem;
+  border-radius: 10px;                 /* round the header bar */
+}
+
+/* Expander header (open) */
+div[data-testid="stExpander"] > details[open] > summary{
+  background: #e0e7ff;
+}
+
+/* Optional hover */
+div[data-testid="stExpander"] > details > summary:hover{
+  background: #e6ecff;
+}
+
+/* extra space under the chip row */
+.chips{ margin-bottom: 1rem !important; }
+
+/* make the bordered card a touch taller globally */
+div[data-testid="stVerticalBlockBorderWrapper"]{
+  padding-bottom: 1rem !important;
+}
+
 
 </style>
 """, unsafe_allow_html=True)
@@ -586,10 +612,15 @@ else:
                         st.markdown(f"<div class='chips'>{chips_m}{chip_fn}{chips_eq}</div>", unsafe_allow_html=True)
 
                     with h_right:
-                        # (these end up stacked)
-                        swap_clicked = st.button("🔀", key=f"chg-{day.day_index}-{idx}-{ex.id}", help="Swap exercise")
-                        remove_clicked = st.button("🗑️", key=f"rm-{day.day_index}-{idx}-{ex.id}",
-                                                   help="Remove exercise", type="secondary")
+                        # a stretchy spacer + two narrow columns for the buttons
+                        spacer, b1, b2 = st.columns([10, 1, 1], vertical_alignment="center")
+                        with b1:
+                            swap_clicked = st.button("🔀", key=f"chg-{day.day_index}-{idx}-{ex.id}",
+                                                     help="Swap exercise", use_container_width=True)
+                        with b2:
+                            remove_clicked = st.button("🗑️", key=f"rm-{day.day_index}-{idx}-{ex.id}",
+                                                       help="Remove exercise", type="secondary",
+                                                       use_container_width=True)
 
                     # Actions (unchanged)
                     if swap_clicked:
