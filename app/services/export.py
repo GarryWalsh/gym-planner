@@ -22,15 +22,16 @@ def _to_pdf_minimal(plan: Plan) -> bytes:
     # Prepare lines
     lines: list[str] = []
     lines.append(f"Gym Plan ({len(plan.days)} days)")
+    lines.append("")
     for day in plan.days:
-        lines.append(f"Day {day.day_index + 1}: {day.label} — Sets {day.sets} Reps {day.reps} Rest {day.rest_seconds}s")
+        lines.append(f"Day {day.day_index + 1}: {day.label}")
         for ex in day.exercises:
-            lines.append(f"  • {ex.name} — {', '.join(ex.primary_muscles)}; {ex.function}; {', '.join(ex.equipment)}")
+            lines.append(f"  - {ex.name} - {', '.join(ex.primary_muscles)}; {ex.function}; {', '.join(ex.equipment)}")
         lines.append("")
     if plan.weekly_focus:
         lines.append("Weekly focus:")
         for k, v in plan.weekly_focus.items():
-            lines.append(f"  • {k}: {v}")
+            lines.append(f"  - {k}: {v}")
 
     content_text = "\n".join(lines)
     # Build PDF content stream using simple text operators
@@ -147,9 +148,6 @@ def to_csv(plan: Plan) -> bytes:
         "primary_muscles",
         "function",
         "equipment",
-        "sets",
-        "reps",
-        "rest_seconds",
         "exrx_url",
     ])
     for day in plan.days:
@@ -162,9 +160,6 @@ def to_csv(plan: Plan) -> bytes:
                 ";".join(ex.primary_muscles),
                 ex.function,
                 ";".join(ex.equipment),
-                day.sets,
-                day.reps,
-                day.rest_seconds,
                 str(ex.exrx_url),
             ])
     return output.getvalue().encode("utf-8")
@@ -175,11 +170,10 @@ def to_markdown(plan: Plan) -> str:
     lines.append(f"# Gym Plan ({len(plan.days)} days)\n")
     for day in plan.days:
         lines.append(f"\n## Day {day.day_index + 1}: {day.label}")
-        lines.append(f"Sets: {day.sets}  Reps: {day.reps}  Rest: {day.rest_seconds}s\n")
         for ex in day.exercises:
             equip = ", ".join(ex.equipment)
             musc = ", ".join(ex.primary_muscles)
-            lines.append(f"- [{ex.name}]({ex.exrx_url}) — {musc}; {ex.function}; {equip}")
+            lines.append(f"- [{ex.name}]({ex.exrx_url}) - {musc}; {ex.function}; {equip}")
     if plan.weekly_focus:
         lines.append("\n### Weekly focus")
         for k, v in plan.weekly_focus.items():
@@ -210,7 +204,7 @@ def to_pdf(plan: Plan) -> bytes:
 
     c.setFont("Helvetica", 10)
     for day in plan.days:
-        header = f"Day {day.day_index + 1}: {day.label} — Sets {day.sets} Reps {day.reps} Rest {day.rest_seconds}s"
+        header = f"Day {day.day_index + 1}: {day.label}"
         if y < margin + 60:
             c.showPage()
             c.setFont("Helvetica", 10)
@@ -218,7 +212,7 @@ def to_pdf(plan: Plan) -> bytes:
         c.drawString(x, y, header)
         y -= 16
         for ex in day.exercises:
-            line = f"• {ex.name} — {', '.join(ex.primary_muscles)}; {ex.function}; {', '.join(ex.equipment)}"
+            line = f"- {ex.name} - {', '.join(ex.primary_muscles)}; {ex.function}; {', '.join(ex.equipment)}"
             # wrap long lines manually (simple)
             max_chars = 95
             parts = [line[i:i+max_chars] for i in range(0, len(line), max_chars)]
@@ -245,7 +239,7 @@ def to_pdf(plan: Plan) -> bytes:
                 c.showPage()
                 c.setFont("Helvetica", 10)
                 y = height - margin
-            c.drawString(x + 12, y, f"• {k}: {v}")
+            c.drawString(x + 12, y, f"- {k}: {v}")
             y -= 14
 
     c.showPage()
