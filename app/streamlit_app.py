@@ -110,7 +110,7 @@ with header_cols[1]:
 
 with st.sidebar:
     st.header("Profile")
-    goal = st.selectbox("Goal", ["Hypertrophy", "Strength", "Hybrid"], index=0)
+    goal = st.selectbox("Goal", ["hypertrophy", "strength", "hybrid"], index=0, format_func=lambda s: s.title())
     days_per_week = st.slider("Days per week", min_value=1, max_value=6, value=3)
     session_minutes_cap = st.slider("Session length cap (min)", 30, 120, 60, step=5)
     max_exercises_per_day = st.slider("Max exercises per day", 3, 10, 5)
@@ -266,10 +266,55 @@ else:
                         musc = sorted({m for ex in day.exercises for m in ex.primary_muscles})
                         musc_pretty = [pretty_text(m) for m in musc]
                         day_summaries.append(f"Day {day.day_index + 1}: {', '.join(musc_pretty)}")
+
+                # Why this plan works — concise reasoning bullets derived locally
+                try:
+                    # Equipment alignment
+                    eq_txt = ", ".join(pretty_text(e) for e in (current_profile.allowed_equipment or [])) if current_profile else ""
+                    # Emphasis coverage
+                    emphasized = [m for m, v in (getattr(current_profile, "emphasis", {}) or {}).items() if v == 1] if current_profile else []
+                    covered = [m for m in emphasized if plan.weekly_focus.get(m, 0) > 0]
+                    # Variety by function
+                    functions = sorted({getattr(ex, "function", "") for d in plan.days for ex in d.exercises}) if plan.days else []
+                    # Max per day and time cap
+                    mx = getattr(current_profile, "max_exercises_per_day", None)
+                    cap = getattr(current_profile, "session_minutes_cap", None)
+
+                    reasoning = []
+                    if functions:
+                        reasoning.append(f"Balanced variety of movement patterns ({', '.join(pretty_text(f) for f in functions)}) across the week.")
+                    if eq_txt:
+                        reasoning.append(f"Matches your equipment selections: {eq_txt}.")
+                    if emphasized:
+                        if covered:
+                            pretty_cov = ", ".join(pretty_text(m) for m in covered)
+                            reasoning.append(f"Honors your focus areas — included: {pretty_cov}.")
+                        else:
+                            reasoning.append("Attempts to honor your muscle focus while respecting other constraints.")
+                    reasoning.append("Avoids duplicate exercises within each session to keep training fresh.")
+                    if mx:
+                        reasoning.append(f"Keeps each day within your max of {mx} exercises")
+                    if cap:
+                        reasoning.append(f"and targets efficient sessions around {cap} minutes.")
+                    # Merge the last two sentences cleanly if both exist
+                    if mx and cap and len(reasoning) >= 2 and reasoning[-2].endswith("exercises") and reasoning[-1].startswith("and "):
+                        merged = reasoning[-2] + ", " + reasoning[-1]
+                        reasoning = reasoning[:-2] + [merged]
+                except Exception:
+                    reasoning = [
+                        "Balanced selection across major muscle groups.",
+                        "Respects your equipment constraints.",
+                        "No duplicates per day for better quality volume.",
+                    ]
+
                 st.markdown(f"**Overview:** {overall}")
                 st.markdown("**By day:**")
                 for s in day_summaries:
                     st.markdown(f"- {s}")
+                if reasoning:
+                    st.markdown("**Why this plan works:**")
+                    for r in reasoning:
+                        st.markdown(f"- {r}")
 
         # Inline form so Enter submits, with Ask button on the same line
         with st.form("qa-form", clear_on_submit=False):
@@ -372,7 +417,7 @@ else:
                             st.session_state["plan"] = replace_one_exercise(current_profile, st.session_state["plan"],
                                                                             day.day_index, ex.id, allowed_ids)
                         st.rerun()
-                    if st.button("🗑 Remove", key=f"rm-{day.day_index}-{idx}-{ex.id}", use_container_width=True):
+                    if st.button("🗑️ Remove", key=f"rm-{day.day_index}-{idx}-{ex.id}", use_container_width=True):
                         # Remove this exercise from the day and recompute weekly focus
                         _plan = st.session_state.get("plan")
                         if _plan is not None:
