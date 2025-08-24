@@ -19,6 +19,8 @@ class LLMError(RuntimeError):
 # Telemetry placeholders for UI annotations
 LAST_USED_MODEL: Optional[str] = None
 LAST_OVERRIDE_NOTE: Optional[str] = None
+LAST_REQUEST: Optional[Dict[str, Any]] = None  # {'model': str, 'system': str, 'user': str}
+LAST_RESPONSE_TEXT: Optional[str] = None
 
 
 def _harden_schema_for_groq(schema: Dict[str, Any]) -> Dict[str, Any]:
@@ -63,7 +65,7 @@ def chat_json(*, schema: Dict[str, Any], system: str, user: str, temperature: fl
     """Strict Groq client — uses exactly the model specified in GROQ_MODEL (or DEFAULT if unset).
     No aliasing, no multi-candidate fallbacks, no guessing.
     """
-    global LAST_USED_MODEL, LAST_OVERRIDE_NOTE
+    global LAST_USED_MODEL, LAST_OVERRIDE_NOTE, LAST_REQUEST, LAST_RESPONSE_TEXT
 
     settings = get_settings()
     if not settings.GROQ_API_KEY:
@@ -76,6 +78,8 @@ def chat_json(*, schema: Dict[str, Any], system: str, user: str, temperature: fl
     client = Groq(api_key=settings.GROQ_API_KEY)
     temp = settings.GROQ_TEMPERATURE if temperature is None else temperature
     requested_model = settings.GROQ_MODEL.strip()
+    LAST_USED_MODEL = requested_model
+    LAST_OVERRIDE_NOTE = None
 
     response_format = {
         "type": "json_schema",
@@ -91,6 +95,10 @@ def chat_json(*, schema: Dict[str, Any], system: str, user: str, temperature: fl
         {"role": "user", "content": user},
     ]
 
+    # Record the last request for debugging/telemetry
+    LAST_REQUEST = {"model": requested_model, "system": system, "user": user}
+    LAST_RESPONSE_TEXT = None
+
     # Simple retry for transient errors (e.g., intermittent 5xx)
     last_error: Optional[str] = None
     for attempt in range(2):
@@ -104,9 +112,11 @@ def chat_json(*, schema: Dict[str, Any], system: str, user: str, temperature: fl
             content = resp.choices[0].message.content
             if not content:
                 raise LLMError("Empty response content from LLM.")
+            LAST_RESPONSE_TEXT = content
             return json.loads(content)
         except Exception as e:  # noqa: PERF203
             last_error = str(e)
+            LAST_RESPONSE_TEXT = last_error
             if attempt == 0:
                 time.sleep(0.5)
                 continue

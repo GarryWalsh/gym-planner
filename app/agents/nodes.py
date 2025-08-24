@@ -112,6 +112,29 @@ def _top_up_days(plan: PlanResponse, req: PlanRequest) -> PlanResponse:
     return plan
 
 
+def _normalize_day_labels(plan: PlanResponse) -> PlanResponse:
+    """Fix day labels that are empty or generic like 'Day N'.
+    Provides semantic defaults to avoid duplicate 'Day N: Day N' display.
+    """
+    defaults = ["Upper Body", "Lower Body", "Push", "Pull", "Full Body", "Accessory"]
+    for day in plan.plan.days:
+        i = day.day_index
+        lbl = (day.label or "").strip()
+        generic = False
+        low = lbl.lower()
+        # Generic if equals 'day {n+1}' optionally with trailing colon or spaces
+        if low in {f"day {i+1}", f"day {i+1}:", f"day{i+1}"}:
+            generic = True
+        # Also treat labels that start with 'day ' and are just a number
+        if not generic and low.startswith("day "):
+            rest = low[4:].strip().rstrip(":")
+            if rest.isdigit():
+                generic = True
+        if not lbl or generic:
+            day.label = defaults[i % len(defaults)]
+    return plan
+
+
 def plan_generate_node(req: PlanRequest) -> PlanResponse:
     llm_err: str | None = None
     # Try LLM first if enabled
@@ -131,6 +154,7 @@ def plan_generate_node(req: PlanRequest) -> PlanResponse:
             pr = PlanResponse.model_validate(resp)
             pr = _dedupe_plan_per_day(pr)
             pr = _top_up_days(pr, req)
+            pr = _normalize_day_labels(pr)
             # Mark LLM source for visibility in UI
             try:
                 pr.plan.meta = dict(pr.plan.meta or {})
@@ -148,6 +172,7 @@ def plan_generate_node(req: PlanRequest) -> PlanResponse:
     pr_local = PlanResponse(plan=plan)
     pr_local = _dedupe_plan_per_day(pr_local)
     pr_local = _top_up_days(pr_local, req)
+    pr_local = _normalize_day_labels(pr_local)
     try:
         pr_local.plan.meta = dict(pr_local.plan.meta or {})
         pr_local.plan.meta.setdefault("source", "local")
