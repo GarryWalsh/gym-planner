@@ -31,50 +31,118 @@ settings = get_settings()
 # ========= Global, robust CSS (APPLIES BEFORE ANY WIDGETS) =========
 st.markdown("""
 <style>
-/* ====== Fix the "pushed down" look inside bordered cards ====== */
-/* 1) Trim the default padding Streamlit adds to st.container(border=True) */
+/* ─────────────────────────────────────────────────────────────────────────────
+   CARD: Use a 2×2 CSS Grid
+   rows:   title | actions
+           chips | actions
+   The actions column spans both rows and is right-aligned.
+   ───────────────────────────────────────────────────────────────────────────── */
+
 div[data-testid="stVerticalBlockBorderWrapper"]{
-  padding: .20rem .70rem !important;     /* smaller top/bottom to prevent content being pushed down */
+  /* Trim the bordered container’s padding so the row doesn’t “float” */
+  padding: .20rem .85rem !important;
 }
 
-/* 2) Tighten vertical rhythm inside the card only */
-div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock{ gap:.18rem !important; }
+/* Turn the *inner* card content into a 2x2 grid */
+div[data-testid="stVerticalBlockBorderWrapper"] > div[data-testid="stVerticalBlock"]{
+  display: grid !important;
+  grid-template-columns: 1fr auto;             /* content | actions */
+  grid-template-areas:
+    "title   actions"
+    "chips   actions";
+  row-gap: .10rem;                              /* tighter, reduces push down */
+  column-gap: .75rem;
+  align-items: center;                          /* centers actions across rows */
+}
 
-/* 3) Kill any stray top margin the first markdown might have */
-div[data-testid="stVerticalBlockBorderWrapper"] .stMarkdown p{ margin-top:0 !important; }
+/* Collapse the first horizontal row so its two columns can be grid items */
+div[data-testid="stVerticalBlockBorderWrapper"]
+  > div[data-testid="stVerticalBlock"]
+  > div[data-testid="stHorizontalBlock"]:first-child{
+  display: contents !important;
+}
 
-/* 4) Columns inside the card (e.g., header row) should not add extra gap */
-div[data-testid="stVerticalBlockBorderWrapper"] div[data-testid="column"] > div{ gap:.18rem !important; }
+/* Map the two columns into the grid */
+div[data-testid="stVerticalBlockBorderWrapper"]
+  > div[data-testid="stVerticalBlock"]
+  > div[data-testid="stHorizontalBlock"]:first-child
+  > div[data-testid="column"]:first-child{          /* title col */
+    grid-area: title;
+}
+div[data-testid="stVerticalBlockBorderWrapper"]
+  > div[data-testid="stVerticalBlock"]
+  > div[data-testid="stHorizontalBlock"]:first-child
+  > div[data-testid="column"]:last-child{           /* actions col */
+    grid-area: actions;
+    justify-self: end;                              /* flush right */
+    padding-right: 0 !important;                    /* remove inner padding */
+    margin-right: -0.6rem;                          /* stronger offset to align tighter to right edge */
+    width: max-content;                             /* shrink-to-fit */
+}
 
-/* ====== Header typography ====== */
+/* Map the chips markdown into the grid *reliably* */
+div[data-testid="stVerticalBlockBorderWrapper"]
+  > div[data-testid="stVerticalBlock"]
+  > .stMarkdown:has(.chips){
+    grid-area: chips;
+    margin: 0 !important;                           /* kill stray margins */
+}
+
+/* Title styling */
 .ex-title{
-  margin:0 !important;
-  display:flex; align-items:center;
-  line-height:30px;                      /* match button height for perfect centering */
-  font-weight:700; font-size:1.08rem;
+  margin: 0 !important;
+  display: flex; align-items: center;
+  line-height: 30px;                                /* matches button height */
+  font-weight: 700; font-size: 1.08rem;
 }
-a.exlink{ color: var(--text-color, inherit) !important; text-decoration:none; }
-a.exlink:hover{ text-decoration:underline; }
+a.exlink{ color: var(--text-color, inherit) !important; text-decoration: none; }
+a.exlink:hover{ text-decoration: underline; }
 
-/* ====== Chips directly under header ====== */
-.chips{ margin:.08rem 0 0 0; display:flex; flex-wrap:wrap; gap:.22rem .34rem; }
+/* Chips row */
+.chips{
+  margin: 0;                                        /* no extra vertical push */
+  display: flex; flex-wrap: wrap;
+  gap: .24rem .38rem;
+}
 .chip{ padding:2px 8px; border-radius:999px; font-size:12px; background:#eef2f7; color:#334155; }
 .chip.fn{ background:#e7f5ff; color:#1e3a8a; }
 .chip.eq{ background:#f1f5f9; }
 
-/* ====== Action buttons: make them small, not full-width ====== */
-.card-actions{ display:flex; gap:.30rem; justify-content:flex-end; align-items:center; }
-.stButton > button{
-  height:30px !important; min-height:30px !important;
-  padding:0 .35rem !important; line-height:1.1 !important; white-space:nowrap !important;
-  min-width:36px !important; width:auto !important;
-  display:inline-flex !important; align-items:center !important; justify-content:center !important;
+/* Actions: stacked, tight, and right aligned */
+div[data-testid="stVerticalBlockBorderWrapper"]
+  > div[data-testid="stVerticalBlock"]
+  > div[data-testid="stHorizontalBlock"]:first-child
+  > div[data-testid="column"]:last-child > div{
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;               /* right edge */
+    justify-content: center !important;             /* center across rows */
+    gap: .32rem !important;
 }
 
-/* ====== Sidebar compaction for equipment/muscles ====== */
-[data-testid="stSidebar"] .stVerticalBlock{ gap:.35rem !important; }
-[data-testid="stSidebar"] .stCheckbox, [data-testid="stSidebar"] .stToggle{ margin-bottom:.18rem !important; }
-label{ white-space:nowrap; }
+/* Compact, uniform buttons */
+.stButton > button, .stDownloadButton > button{
+  display:inline-flex !important; align-items:center !important; justify-content:center !important;
+  height:30px !important; min-height:30px !important;
+  padding:0 .56rem !important; line-height:1.1 !important; white-space:nowrap !important;
+}
+
+/* ── Sidebar spacing (comfortable but not cramped) ─────────────────────────── */
+[data-testid="stSidebar"] .stVerticalBlock{ gap:.55rem !important; }
+[data-testid="stSidebar"] .stCheckbox{ margin-bottom:.34rem !important; }
+.stCheckbox label{ white-space: nowrap; }
+
+/* ── Optional: widen the sidebar (pick a width and keep it consistent) ─────── */
+:root{ --sidebar-w: 330px; }                        /* <— adjust to taste */
+
+section[data-testid="stSidebar"]{
+  min-width: var(--sidebar-w) !important;
+  width: var(--sidebar-w) !important;
+}
+section[data-testid="stSidebar"] > div{
+  min-width: var(--sidebar-w) !important;
+  width: var(--sidebar-w) !important;
+}
 </style>
 """, unsafe_allow_html=True)
 # ================================================================
@@ -431,26 +499,25 @@ else:
             for idx, ex in enumerate(day.exercises):
                 card = st.container(border=True)
                 with card:
-                    # Header: title (left) + stacked actions (right)
-                    h_left, h_right = st.columns([19, 5], gap="small", vertical_alignment="center")
+                    # Header: title (left, grid-area: title) + actions (right, grid-area: actions)
+                    h_left, h_right = st.columns([19, 5], gap="small")  # vertical centering handled by CSS grid
 
                     with h_left:
                         st.markdown(
                             f"<div class='ex-title'><a class='exlink' href='{ex.exrx_url}' target='_blank'>{ex.name}</a></div>",
                             unsafe_allow_html=True)
+                        # Chips tucked directly under the title for tight alignment
+                        chips_m = "".join(f"<span class='chip'>{pretty_text(m)}</span>" for m in ex.primary_muscles)
+                        chip_fn = f"<span class='chip fn'>{pretty_text(ex.function)}</span>"
+                        chips_eq = "".join(f"<span class='chip eq'>{pretty_text(e)}</span>" for e in ex.equipment)
+                        st.markdown(f"<div class='chips'>{chips_m}{chip_fn}{chips_eq}</div>", unsafe_allow_html=True)
 
                     with h_right:
-                        c1, c2 = st.columns([1, 1], gap="small")
-                        with c1:
-                            swap_clicked = st.button("🔀", key=f"chg-{day.day_index}-{idx}-{ex.id}", help="Swap exercise")
-                        with c2:
-                            remove_clicked = st.button("🗑️", key=f"rm-{day.day_index}-{idx}-{ex.id}", help="Remove exercise", type="secondary")
+                        # Just place the two buttons one after another — CSS stacks & centers them
+                        swap_clicked = st.button("🔀", key=f"chg-{day.day_index}-{idx}-{ex.id}", help="Swap exercise")
+                        remove_clicked = st.button("🗑️", key=f"rm-{day.day_index}-{idx}-{ex.id}",
+                                                   help="Remove exercise", type="secondary")
 
-                    # Chips directly under header
-                    chips_m = "".join(f"<span class='chip'>{pretty_text(m)}</span>" for m in ex.primary_muscles)
-                    chip_fn = f"<span class='chip fn'>{pretty_text(ex.function)}</span>"
-                    chips_eq = "".join(f"<span class='chip eq'>{pretty_text(e)}</span>" for e in ex.equipment)
-                    st.markdown(f"<div class='chips'>{chips_m}{chip_fn}{chips_eq}</div>", unsafe_allow_html=True)
 
                     # Actions (unchanged)
                     if swap_clicked:
