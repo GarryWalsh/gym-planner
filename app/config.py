@@ -3,6 +3,7 @@ from __future__ import annotations
 from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
+import os
 
 
 class Settings(BaseSettings):
@@ -22,4 +23,24 @@ class Settings(BaseSettings):
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    return Settings()  # type: ignore[call-arg]
+    # Allow Streamlit Cloud secrets to override or provide env values
+    overrides: dict = {}
+    try:
+        import streamlit as _st  # type: ignore
+        sec = getattr(_st, "secrets", None)
+        if sec:
+            for k in ["APP_ENV", "LOG_LEVEL", "GROQ_API_KEY", "GROQ_MODEL", "GROQ_TEMPERATURE"]:
+                if k in sec and sec[k] is not None and sec[k] != "":
+                    overrides[k] = sec[k]
+    except Exception:
+        pass
+    s = Settings(**overrides)  # type: ignore[call-arg]
+    # Extra fallback: if GROQ_API_KEY is blank/None but present in process env, use it
+    if not s.GROQ_API_KEY:
+        env_key = os.environ.get("GROQ_API_KEY")
+        if env_key:
+            try:
+                s.GROQ_API_KEY = env_key  # type: ignore[assignment]
+            except Exception:
+                pass
+    return s

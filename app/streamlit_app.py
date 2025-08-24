@@ -108,16 +108,16 @@ a.exlink:hover{ text-decoration: underline; }
 .chip.fn{ background:#e7f5ff; color:#1e3a8a; }
 .chip.eq{ background:#f1f5f9; }
 
-/* Actions: stacked, tight, and right aligned */
+/* Actions: side-by-side, tight, and right aligned */
 div[data-testid="stVerticalBlockBorderWrapper"]
   > div[data-testid="stVerticalBlock"]
   > div[data-testid="stHorizontalBlock"]:first-child
   > div[data-testid="column"]:last-child > div{
     display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-end !important;               /* right edge */
-    justify-content: center !important;             /* center across rows */
-    gap: .32rem !important;
+    flex-direction: row !important;                 /* side-by-side */
+    align-items: center !important;                 /* vertically centered */
+    justify-content: flex-end !important;           /* right edge */
+    gap: .25rem !important;                         /* tight spacing */
 }
 
 /* Compact, uniform buttons */
@@ -178,23 +178,8 @@ header_cols = st.columns([9, 1])
 with header_cols[0]:
     st.title("Gym Plan Creator")
 with header_cols[1]:
-    st.markdown("<div class='header-right'>", unsafe_allow_html=True)
-    with st.popover("ℹ️ Info"):
-        st.markdown("""
-            Welcome! This tool builds a weekly gym plan from a curated exercise catalog (with ExRx links).
-
-            What happens when you click Generate:
-            - We shortlist exercises that match your equipment and muscle choices.
-            - A plan is created with simple, balanced days and no duplicates within a day.
-            - If you’ve set a GROQ_API_KEY, an LLM double-checks and lightly repairs the plan using strict JSON outputs.
-              Otherwise a local checker runs.
-            - You can swap or remove individual exercises at any time.
-
-            Notes on privacy & safety:
-            - We only use your selections and exercise metadata; no personal data is sent.
-            - LLM responses are strictly schema-validated before being shown.
-        """)
-    st.markdown("</div>", unsafe_allow_html=True)
+    # Moved Info button next to the Q&A header for better alignment
+    pass
 
 with st.sidebar:
     st.header("Profile")
@@ -247,10 +232,12 @@ with st.sidebar:
         return selected
 
     equipment_all = list(Equipment.__args__)  # type: ignore[attr-defined]
-    selected_equipment = toggle_grid("eq", "Equipment", equipment_all, equipment_all, cols=2)
+    with st.expander("Equipment", expanded=False):
+        selected_equipment = toggle_grid("eq", "", equipment_all, equipment_all, cols=2)
 
     muscles_all_raw = get_all_muscles()
-    selected_muscles = toggle_grid("ms", "Muscles", muscles_all_raw, muscles_all_raw, cols=2)
+    with st.expander("Muscles", expanded=False):
+        selected_muscles = toggle_grid("ms", "", muscles_all_raw, muscles_all_raw, cols=2)
 
     # Build emphasis map 0/1 from selected muscles and derive blacklist as complement
     emphasis_map: Dict[str, int] = {m: (1 if m in selected_muscles else 0) for m in muscles_all_raw}
@@ -272,17 +259,18 @@ with st.sidebar:
     )
 
     if st.button("Generate plan", use_container_width=True):
-        ids = shortlist(profile)
-        if not ids:
-            st.error("No exercises available with the current constraints. Adjust filters and try again.")
-        else:
-            import time as _time
-            graph = PlanGraph()
-            seed = int(_time.time() * 1000) & 0x7FFFFFFF
-            state = graph.invoke(profile, seed=seed)
-            st.session_state["plan"] = state["plan_res"].plan  # type: ignore[index]
-            st.session_state["profile"] = profile
-            st.toast("Plan generated.")
+        import time as _time
+        with st.spinner("Generating plan…"):
+            ids = shortlist(profile)
+            if not ids:
+                st.error("No exercises available with the current constraints. Adjust filters and try again.")
+            else:
+                graph = PlanGraph()
+                seed = int(_time.time() * 1000) & 0x7FFFFFFF
+                state = graph.invoke(profile, seed=seed)
+                st.session_state["plan"] = state["plan_res"].plan  # type: ignore[index]
+                st.session_state["profile"] = profile
+                st.toast("Plan generated.")
 
 plan = st.session_state.get("plan")
 current_profile: UserProfile | None = st.session_state.get("profile")
@@ -290,7 +278,18 @@ current_profile: UserProfile | None = st.session_state.get("profile")
 if plan is None:
     st.info("Use the sidebar to create a profile and click Generate plan.")
 else:
-    st.subheader(f"{len(plan.days)} Day Plan")
+    hdr_l, hdr_r = st.columns([8, 2])
+    with hdr_l:
+        st.subheader(f"{len(plan.days)} Day Plan")
+    with hdr_r:
+        try:
+            _src = (getattr(plan, "meta", {}) or {}).get("source")  # type: ignore[attr-defined]
+        except Exception:
+            _src = None
+        if not _src:
+            _src = "llm" if settings.GROQ_API_KEY else "local"
+        badge = "🧩 Mode: LLM" if _src == "llm" else "🧰 Mode: Local"
+        st.markdown(f"<div style='text-align:right'>{badge}</div>", unsafe_allow_html=True)
 
     # Single-row actions: plan options left, export right
     csv_bytes = to_csv(plan)
@@ -304,23 +303,24 @@ else:
 
     # Toolbar: left actions (Regenerate, Clear), right exports (CSV/MD/PDF)
     with st.container():
-        left_zone, spacer_zone, right_zone = st.columns([6, 2, 6])
+        left_zone, spacer_zone, right_zone = st.columns([4, 4, 6])
         with left_zone:
-            a1, a2 = st.columns([2, 1])
+            a1, a2 = st.columns([1, 1])
             with a1:
                 if st.button("🔁 Regenerate plan", key="btn-regenerate", use_container_width=True, type="secondary"):
-                    ids = shortlist(profile)
-                    if not ids:
-                        st.error("No exercises available with the current constraints. Adjust filters and try again.")
-                    else:
-                        import time as _time
-                        graph = PlanGraph()
-                        seed = int(_time.time() * 1000) & 0x7FFFFFFF
-                        state = graph.invoke(profile, seed=seed)
-                        st.session_state["plan"] = state["plan_res"].plan  # type: ignore[index]
-                        st.session_state["profile"] = profile
-                        st.toast("Plan regenerated.")
-                        st.rerun()
+                    import time as _time
+                    with st.spinner("Regenerating plan…"):
+                        ids = shortlist(profile)
+                        if not ids:
+                            st.error("No exercises available with the current constraints. Adjust filters and try again.")
+                        else:
+                            graph = PlanGraph()
+                            seed = int(_time.time() * 1000) & 0x7FFFFFFF
+                            state = graph.invoke(profile, seed=seed)
+                            st.session_state["plan"] = state["plan_res"].plan  # type: ignore[index]
+                            st.session_state["profile"] = profile
+                            st.toast("Plan regenerated.")
+                    st.rerun()
             with a2:
                 if st.button("🧹 Clear plan", key="btn-clear", use_container_width=True):
                     st.session_state["plan"] = None
@@ -342,18 +342,28 @@ else:
     # Fitness Q&A (strictly validated)
     st.markdown("\n")
     with st.container():
-        hdr = st.columns([9, 1])
-        with hdr[0]:
-            st.subheader("Ask about your plan")
-        with hdr[1]:
+        pop_cols = st.columns([1, 1])
+        with pop_cols[0]:
+            with st.popover("ℹ️ How it works"):
+                st.markdown(
+                    """
+                    How it works:
+                    - Filters the catalog by your equipment and muscle selections.
+                    - Generates a balanced plan with no duplicates per day.
+                    - If GROQ_API_KEY is set, an LLM validates and minimally repairs the plan using strict JSON; otherwise a local validator runs.
+                    - You can swap or remove exercises anytime; downloads are available below.
+                    """
+                )
+        with pop_cols[1]:
             with st.popover("🧠 Summary"):
                 overall: str
                 day_summaries: List[str]
                 if settings.GROQ_API_KEY:
                     try:
-                        exr = explain_plan_llm(current_profile, plan)  # type: ignore[arg-type]
-                        overall = exr.overall
-                        day_summaries = exr.day_summaries
+                        with st.spinner("Summarizing plan via LLM…"):
+                            exr = explain_plan_llm(current_profile, plan)  # type: ignore[arg-type]
+                            overall = exr.overall
+                            day_summaries = exr.day_summaries
                     except Exception:
                         day_summaries = []
                         overall = f"Your plan supports a {current_profile.goal} goal with {len(plan.days)} sessions, balancing major muscle groups and your selections."
@@ -424,7 +434,7 @@ else:
                 q = st.text_input(
                     "Ask about your plan",
                     value="",
-                    placeholder="e.g. Which days train chest? Where are legs trained?",
+                    placeholder="Ask about your plan e.g. Which days train chest? Where are legs trained?",
                     key="qa-input",
                     label_visibility="collapsed",
                 )
@@ -455,8 +465,9 @@ else:
                 answer_text: str | None = None
                 if settings.GROQ_API_KEY:
                     try:
-                        qa = answer_plan_question_llm(current_profile, plan, q)  # type: ignore[arg-type]
-                        answer_text = (qa.answer or "").strip()
+                        with st.spinner("Answering with LLM…"):
+                            qa = answer_plan_question_llm(current_profile, plan, q)  # type: ignore[arg-type]
+                            answer_text = (qa.answer or "").strip()
                     except Exception:
                         answer_text = None
                 if not answer_text:
@@ -522,16 +533,17 @@ else:
                     # Actions (unchanged)
                     if swap_clicked:
                         allowed_ids = shortlist(current_profile)
-                        if settings.GROQ_API_KEY:
-                            try:
-                                st.session_state["plan"] = replace_exercise_llm(current_profile,
-                                    st.session_state["plan"], day.day_index, ex.id, allowed_ids)
-                            except Exception:
-                                st.session_state["plan"] = replace_one_exercise(current_profile,
-                                    st.session_state["plan"], day.day_index, ex.id, allowed_ids)
-                        else:
-                            st.session_state["plan"] = replace_one_exercise(current_profile, st.session_state["plan"],
-                                day.day_index, ex.id, allowed_ids)
+                        with st.spinner("Swapping…"):
+                            if settings.GROQ_API_KEY:
+                                try:
+                                    st.session_state["plan"] = replace_exercise_llm(current_profile,
+                                        st.session_state["plan"], day.day_index, ex.id, allowed_ids)
+                                except Exception:
+                                    st.session_state["plan"] = replace_one_exercise(current_profile,
+                                        st.session_state["plan"], day.day_index, ex.id, allowed_ids)
+                            else:
+                                st.session_state["plan"] = replace_one_exercise(current_profile, st.session_state["plan"],
+                                    day.day_index, ex.id, allowed_ids)
                         st.toast("Exercise swapped.")
                         st.rerun()
 

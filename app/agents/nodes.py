@@ -130,6 +130,12 @@ def plan_generate_node(req: PlanRequest) -> PlanResponse:
             pr = PlanResponse.model_validate(resp)
             pr = _dedupe_plan_per_day(pr)
             pr = _top_up_days(pr, req)
+            # Mark LLM source for visibility in UI
+            try:
+                pr.plan.meta = dict(pr.plan.meta or {})
+                pr.plan.meta["source"] = "llm"
+            except Exception:
+                pass
             return pr
         except Exception:
             # fall back to local
