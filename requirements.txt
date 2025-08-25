@@ -4,3 +4,5 @@ pydantic-settings==2.10.1
 typing-extensions==4.14.1
 groq==0.31.0
 reportlab==4.2.2
+
+requests==2.32.3

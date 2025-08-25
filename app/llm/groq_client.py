@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import time
 import copy
+from datetime import datetime
 from typing import Any, Dict, Optional
 
 from app.config import get_settings
@@ -95,8 +96,9 @@ def chat_json(*, schema: Dict[str, Any], system: str, user: str, temperature: fl
         {"role": "user", "content": user},
     ]
 
-    # Record the last request for debugging/telemetry
-    LAST_REQUEST = {"model": requested_model, "system": system, "user": user}
+    # Record the last request for debugging/telemetry (with UTC timestamp)
+    ts = datetime.utcnow().isoformat(timespec="seconds") + "Z"
+    LAST_REQUEST = {"model": requested_model, "system": system, "user": user, "ts": ts}
     LAST_RESPONSE_TEXT = None
 
     # Simple retry for transient errors (e.g., intermittent 5xx)
