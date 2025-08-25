@@ -22,6 +22,12 @@ LAST_USED_MODEL: Optional[str] = None
 LAST_OVERRIDE_NOTE: Optional[str] = None
 LAST_REQUEST: Optional[Dict[str, Any]] = None  # {'model': str, 'system': str, 'user': str}
 LAST_RESPONSE_TEXT: Optional[str] = None
+# Per-job telemetry
+LAST_REQUESTS_BY_JOB: Dict[str, Dict[str, Any]] = {}
+REQUEST_LOG: list[Dict[str, Any]] = []
+# Full exchange logs (inputs + outputs)
+EXCHANGE_BY_JOB: Dict[str, Dict[str, Any]] = {}
+EXCHANGE_LOG: list[Dict[str, Any]] = []
 
 
 def _harden_schema_for_groq(schema: Dict[str, Any]) -> Dict[str, Any]:
@@ -62,7 +68,7 @@ def _harden_schema_for_groq(schema: Dict[str, Any]) -> Dict[str, Any]:
     return visit(copy.deepcopy(schema))
 
 
-def chat_json(*, schema: Dict[str, Any], system: str, user: str, temperature: float | None = None) -> Dict[str, Any]:
+def chat_json(*, schema: Dict[str, Any], system: str, user: str, temperature: float | None = None, job: str | None = None) -> Dict[str, Any]:
     """Strict Groq client — uses exactly the model specified in GROQ_MODEL (or DEFAULT if unset).
     No aliasing, no multi-candidate fallbacks, no guessing.
     """
@@ -99,6 +105,17 @@ def chat_json(*, schema: Dict[str, Any], system: str, user: str, temperature: fl
     # Record the last request for debugging/telemetry (with UTC timestamp)
     ts = datetime.utcnow().isoformat(timespec="seconds") + "Z"
     LAST_REQUEST = {"model": requested_model, "system": system, "user": user, "ts": ts}
+    # Per-job logging
+    try:
+        if job:
+            entry = {"job": job, "model": requested_model, "system": system, "user": user, "ts": ts}
+            LAST_REQUESTS_BY_JOB[job] = entry
+            # Append to rolling request log (cap at 100)
+            REQUEST_LOG.append(entry)
+            if len(REQUEST_LOG) > 100:
+                del REQUEST_LOG[0:len(REQUEST_LOG)-100]
+    except Exception:
+        pass
     LAST_RESPONSE_TEXT = None
 
     # Simple retry for transient errors (e.g., intermittent 5xx)
@@ -115,6 +132,16 @@ def chat_json(*, schema: Dict[str, Any], system: str, user: str, temperature: fl
             if not content:
                 raise LLMError("Empty response content from LLM.")
             LAST_RESPONSE_TEXT = content
+            # Log full exchange
+            try:
+                entry = {"job": job or "unknown", "model": requested_model, "ts": ts, "system": system, "user": user, "response": content, "ok": True}
+                if job:
+                    EXCHANGE_BY_JOB[job] = entry  # type: ignore[index]
+                EXCHANGE_LOG.append(entry)
+                if len(EXCHANGE_LOG) > 100:
+                    del EXCHANGE_LOG[0:len(EXCHANGE_LOG)-100]
+            except Exception:
+                pass
             return json.loads(content)
         except Exception as e:  # noqa: PERF203
             last_error = str(e)
@@ -122,6 +149,16 @@ def chat_json(*, schema: Dict[str, Any], system: str, user: str, temperature: fl
             if attempt == 0:
                 time.sleep(0.5)
                 continue
+            # Final failure: log exchange with error details
+            try:
+                entry = {"job": job or "unknown", "model": requested_model, "ts": ts, "system": system, "user": user, "response": last_error, "ok": False}
+                if job:
+                    EXCHANGE_BY_JOB[job] = entry  # type: ignore[index]
+                EXCHANGE_LOG.append(entry)
+                if len(EXCHANGE_LOG) > 100:
+                    del EXCHANGE_LOG[0:len(EXCHANGE_LOG)-100]
+            except Exception:
+                pass
             # Give the exact underlying reason back to the caller (nodes/UI will display it)
             raise LLMError(f"LLM call failed (model='{requested_model}'): {last_error}")
     return {}

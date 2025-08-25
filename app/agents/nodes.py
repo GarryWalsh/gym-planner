@@ -150,6 +150,7 @@ def plan_generate_node(req: PlanRequest) -> PlanResponse:
                 system=system,
                 user=json.dumps(payload, ensure_ascii=False),
                 temperature=0.2,
+                job="plan_generate",
             )
             pr = PlanResponse.model_validate(resp)
             pr = _dedupe_plan_per_day(pr)
@@ -215,6 +216,7 @@ def validate_node(req: ValidationRequest) -> ValidationReport:
                 system=system,
                 user=json.dumps(payload, ensure_ascii=False),
                 temperature=0.0,
+                job="validate",
             )
             return ValidationReport.model_validate(resp)
         except Exception:
@@ -259,6 +261,7 @@ def repair_node(req: RepairRequest) -> RepairResponse:
                 system=system,
                 user=json.dumps(payload, ensure_ascii=False),
                 temperature=0.2,
+                job="repair",
             )
             return RepairResponse.model_validate(resp)
         except Exception:

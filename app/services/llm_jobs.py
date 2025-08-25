@@ -55,6 +55,7 @@ def explain_plan_llm(profile: UserProfile, plan: Plan) -> ExplainResponse:
         system=system,
         user=json.dumps(payload, ensure_ascii=False),
         temperature=0.2,
+        job="explain",
     )
     return ExplainResponse.model_validate(resp)
 
@@ -79,6 +80,7 @@ def replace_exercise_llm(
         system=system,
         user=json.dumps(payload, ensure_ascii=False),
         temperature=0.2,
+        job="replace",
     )
     rr = ReplacementResponse.model_validate(resp)
     return rr.plan
@@ -96,5 +98,6 @@ def answer_plan_question_llm(profile: UserProfile, plan: Plan, question: str) ->
         system=system,
         user=json.dumps(payload, ensure_ascii=False),
         temperature=0.2,
+        job="qa",
     )
     return PlanQAResponse.model_validate(resp)

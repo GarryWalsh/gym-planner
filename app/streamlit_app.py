@@ -159,13 +159,6 @@ div[data-testid="stVerticalBlockBorderWrapper"]:has(.daybox-sentinel){
   padding: .8rem 1rem !important;
 }
 
-/* Inside a yellow day container, make exercise rows “flat” so the whole card reads as one */
-div[data-testid="stVerticalBlockBorderWrapper"]:has(.daybox-sentinel) .ex-card{
-  background: transparent !important;     /* remove tile background */
-  border: 0 !important;                   /* no inner border */
-  padding: 6px 0 !important;              /* keep nice spacing */
-}
-
 /* Optional: style the 3-dot menu trigger a bit */
 div[data-testid="stPopover"] > div > button:has(> span.kebab){
   width: 30px; height: 30px; border-radius: 8px;
@@ -585,7 +578,7 @@ else:
                         st.markdown(html, unsafe_allow_html=True)
                     with row_r:
                         # 3-dot menu for actions
-                        pop_label = f"⋯\u200B"
+                        pop_label = f"⋯"
                         with st.popover(pop_label):
                             swap_clicked = st.button("🔀 Swap exercise", key=f"swap-{day.day_index}-{idx}-{ex.id}",
                                                      use_container_width=True)
@@ -664,3 +657,31 @@ if _show_ai:
             if groq_debug.LAST_RESPONSE_TEXT:
                 st.markdown("**Raw response:**")
                 st.code(groq_debug.LAST_RESPONSE_TEXT)
+
+            # Recent full exchanges (inputs & outputs)
+            ex_log = getattr(groq_debug, "EXCHANGE_LOG", []) or []
+            if ex_log:
+                st.markdown("**Recent AI exchanges:**")
+                # Show up to 5 latest entries
+                show = list(ex_log[-5:])
+                def _fmt(ts: str | None) -> str:
+                    if not ts:
+                        return ""
+                    t = ts
+                    if isinstance(t, str) and t.endswith("Z"):
+                        t = t[:-1]
+                    try:
+                        from datetime import datetime
+                        dt = datetime.fromisoformat(t)
+                        return dt.strftime("%a, %d %b %Y %H:%M UTC")
+                    except Exception:
+                        return f"{ts} (UTC)"
+                for e in reversed(show):
+                    title = f"{e.get('job','unknown')} — {_fmt(e.get('ts'))} — {e.get('model','?')} — {'OK' if e.get('ok') else 'ERR'}"
+                    with st.expander(title, expanded=False):
+                        st.markdown("System prompt:")
+                        st.code(e.get("system", ""))
+                        st.markdown("User payload (JSON):")
+                        st.code(e.get("user", ""), language="json")
+                        st.markdown("Response:")
+                        st.code(e.get("response", ""))
