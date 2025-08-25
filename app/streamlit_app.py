@@ -626,13 +626,20 @@ if _show_ai:
         with st.expander("AI Insight", expanded=False):
             model_used = (groq_debug.LAST_USED_MODEL or "unknown")
             st.markdown(f"**Model:** `{model_used}`")
-            # Timestamp (UTC) if available
+            # Timestamp (UTC) if available (human-readable)
             try:
                 ts = (groq_debug.LAST_REQUEST or {}).get("ts")
             except Exception:
                 ts = None
             if ts:
-                st.markdown(f"**Requested at:** {ts} (UTC)")
+                t = ts[:-1] if isinstance(ts, str) and ts.endswith("Z") else ts
+                try:
+                    from datetime import datetime
+                    dt = datetime.fromisoformat(t)
+                    nice = dt.strftime("%a, %d %b %Y %H:%M UTC")
+                except Exception:
+                    nice = f"{ts} (UTC)"
+                st.markdown(f"**Requested at:** {nice}")
 
             # If there was an AI failure, show details here
             if _meta.get("llm_error"):
