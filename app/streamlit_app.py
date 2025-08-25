@@ -169,6 +169,8 @@ div[data-testid="stPopover"] > div > button:has(> span.kebab):hover{
   background: rgba(0,0,0,.08);
 }
 
+.stMarkdown h3 { margin-top: -2rem !important; })
+
 </style>
 """, unsafe_allow_html=True)
 # ================================================================
@@ -641,11 +643,7 @@ if _show_ai:
                 detail = _meta.get("llm_error_detail") or err
                 if note:
                     st.markdown(f"- Note: {note}")
-                if err:
-                    st.markdown("- Summary error:")
-                    st.code(str(err))
                 if detail and detail != err:
-                    st.markdown("- Full error detail:")
                     st.code(str(detail))
 
             # Prompt/response telemetry
